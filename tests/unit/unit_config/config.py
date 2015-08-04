@@ -113,4 +113,11 @@ devices = {
         "use_float": True,
         "ipinip": True
     },
+    "axhost": {
+        "host": "10.10.100.24",
+        "username": "admin",
+        "password": "a10",
+        "protocol": "https",
+        "enable_port_binding": True
+    }
 }
