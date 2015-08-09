@@ -121,6 +121,6 @@ devices = {
         "username": "admin",
         "password": "a10",
         "protocol": "https",
-        "enable_port_binding": True
+        "enable_host_binding": True
     }
 }
