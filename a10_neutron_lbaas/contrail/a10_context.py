@@ -15,19 +15,21 @@
 import logging
 
 import acos_client.errors as acos_errors
+from neutron import context as ncontext
+
 
 LOG = logging.getLogger(__name__)
 
 
 class A10Context(object):
 
-    def __init__(self, handler, openstack_context, openstack_lbaas_obj,
+    def __init__(self, handler, openstack_lbaas_obj,
                  **kwargs):
         self.handler = handler
+        self.openstack_context = ncontext.get_admin_context()
         self.openstack_driver = handler.openstack_driver
         self.a10_driver = handler.a10_driver
         self.hooks = self.a10_driver.hooks
-        self.openstack_context = openstack_context
         self.openstack_lbaas_obj = openstack_lbaas_obj
         self.device_name = kwargs.get('device_name', None)
         LOG.debug("A10Context obj=%s", openstack_lbaas_obj)
