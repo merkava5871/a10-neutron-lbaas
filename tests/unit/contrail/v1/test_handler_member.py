@@ -54,16 +54,16 @@ class TestMembers(test_base.UnitTestBase):
         self.assertEqual(z, '_ten1_1_1_1_1_neutron')
 
     def test_count(self):
-        self.a.member.neutron.member_count(None, self.fake_member())
+        self.a.member.contrail.member_count(None, self.fake_member())
 
     def fake_member(pool_id='pool1', admin_state_up=True):
         return _fake_member(pool_id, admin_state_up)
 
     def test_create(self, admin_state_up=True):
         m = self.fake_member(admin_state_up=admin_state_up)
-        ip = self.a.member.neutron.member_get_ip(None, m, True)
+        ip = self.a.member.contrail.member_get_ip(None, m, True)
         name = self.a.member._get_name(m, ip)
-        self.a.member.create(None, m)
+        self.a.member.create(m)
 
         self.a.last_client.slb.server.create.assert_called_with(
             name, ip,
@@ -82,9 +82,9 @@ class TestMembers(test_base.UnitTestBase):
 
     def test_update_down(self):
         m = self.fake_member(admin_state_up=False)
-        ip = self.a.member.neutron.member_get_ip(None, m, True)
+        ip = self.a.member.contrail.member_get_ip(None, m, True)
         name = self.a.member._get_name(m, ip)
-        self.a.member.update(None, m, m)
+        self.a.member.update(m, m)
 
         pool_name = self.a.member._pool_name(None, m['pool_id'])
         self.a.last_client.slb.service_group.member.update.assert_called_with(
@@ -94,20 +94,20 @@ class TestMembers(test_base.UnitTestBase):
 
     def test_delete(self):
         m = self.fake_member()
-        ip = self.a.member.neutron.member_get_ip(None, m, True)
+        ip = self.a.member.contrail.member_get_ip(None, m, True)
 
         self.set_count_1()
-        self.a.member.delete(None, m)
+        self.a.member.delete(m)
 
         self.a.last_client.slb.server.delete(ip)
 
     def test_delete_count_gt_one(self):
         m = self.fake_member()
-        ip = self.a.member.neutron.member_get_ip(None, m, True)
+        ip = self.a.member.contrail.member_get_ip(None, m, True)
         name = self.a.member._get_name(m, ip)
 
         self.set_count_2()
-        self.a.member.delete(None, m)
+        self.a.member.delete(m)
 
         pool_name = self.a.member._pool_name(None, m['pool_id'])
         self.a.last_client.slb.service_group.member.delete.assert_called_with(

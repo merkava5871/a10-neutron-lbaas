@@ -26,26 +26,26 @@ class PlumbingHooks(object):
         s = self.appliance_hash.get_server(tenant_id)
         return self.driver.config.devices[s]
 
-    def partition_create(self, client, context, partition_name):
+    def partition_create(self, client, partition_name):
         client.system.partition.create(partition_name)
 
-    def partition_delete(self, client, context, partition_name):
+    def partition_delete(self, client, partition_name):
         client.system.partition.delete(partition_name)
 
-    def after_member_create(self, client, context, member):
+    def after_member_create(self, client, member):
         pass
 
-    def after_member_update(self, client, context, member):
+    def after_member_update(self, client, member):
         pass
 
-    def after_member_delete(self, client, context, member):
+    def after_member_delete(self, client, member):
         pass
 
-    def after_vip_create(self, client, context, vip):
+    def after_vip_create(self, client, vip):
         pass
 
-    def after_vip_update(self, client, context, vip):
+    def after_vip_update(self, client, vip):
         pass
 
-    def after_vip_delete(self, client, context, vip):
+    def after_vip_delete(self, client, vip):
         pass

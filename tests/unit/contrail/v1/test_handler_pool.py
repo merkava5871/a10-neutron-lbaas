@@ -46,7 +46,7 @@ class TestPools(test_base.UnitTestBase):
                 saw_exception = False
 
                 pool = self.fake_pool(p, m)
-                self.a.pool.create(None, pool)
+                self.a.pool.create(pool)
 
                 self.print_mocks()
 
@@ -64,7 +64,7 @@ class TestPools(test_base.UnitTestBase):
     def test_update(self):
         old_pool = self.fake_pool('TCP', 'LEAST_CONNECTIONS')
         pool = self.fake_pool('TCP', 'ROUND_ROBIN')
-        self.a.pool.update(None, old_pool, pool)
+        self.a.pool.update(old_pool, pool)
         self.print_mocks()
         self.a.last_client.slb.service_group.create(
             pool['id'],
@@ -77,7 +77,7 @@ class TestPools(test_base.UnitTestBase):
         pool = self.fake_pool('TCP', 'LEAST_CONNECTIONS')
         pool['members'] = [test_handler_member._fake_member()]
         pool['health_monitors_status'] = [{'monitor_id': 'hm1'}]
-        self.a.pool.delete(None, pool)
+        self.a.pool.delete(pool)
 
         self.print_mocks()
 

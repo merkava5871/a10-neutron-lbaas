@@ -24,7 +24,7 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
     def _name(self, hm):
         return hm['id'][0:28]
 
-    def _set(self, c, set_method, context, hm):
+    def _set(self, c, set_method, hm):
         hm_name = self._meta_name(hm)
         method = None
         url = None
@@ -41,45 +41,46 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
                    method=method, url=url, expect_code=expect_code,
                    axapi_args=args)
 
-    def create(self, context, hm, pool_id):
+    def create(self, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
-        with a10.A10WriteHMStatusContext(self, context, h) as c:
+        with a10.A10WriteHMStatusContext(self, h) as c:
             try:
-                self._set(c, c.client.slb.hm.create, context, hm)
+                self._set(c, c.client.slb.hm.create, hm)
             except acos_errors.Exists:
                 pass
 
             if pool_id is not None:
                 c.client.slb.service_group.update(
-                    self._pool_name(context, pool_id),
+                    self._pool_name(pool_id),
                     health_monitor=self._meta_name(hm))
 
             for pool in hm['pools']:
                 if pool['pool_id'] == pool_id:
                     continue
                 c.client.slb.service_group.update(
-                    self._pool_name(context, pool['pool_id']),
+                    self._pool_name(pool['pool_id']),
                     health_monitor=self._meta_name(hm))
 
-    def update(self, context, old_hm, hm, pool_id):
+    def update(self, old_hm, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
-        with a10.A10WriteHMStatusContext(self, context, h) as c:
-            self._set(c, c.client.slb.hm.update, context, hm)
+        with a10.A10WriteHMStatusContext(self, h) as c:
+            self._set(c, c.client.slb.hm.update, hm)
 
     def _delete(self, c, context, hm):
         c.client.slb.hm.delete(self._meta_name(hm))
 
-    def delete(self, context, hm, pool_id):
+    def delete(self, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
-        with a10.A10DeleteHMContext(self, context, h) as c:
-            if self.neutron.hm_binding_count(context, hm['id']) <= 1:
+        with a10.A10DeleteHMContext(self, h) as c:
+            # TODO(tyeamvnc) - Replace with call to contrail ops
+            if False: # self.neutron.hm_binding_count(hm['id']) <= 1:
                 try:
-                    self._delete(c, context, hm)
+                    self._delete(c, hm)
                 except acos_errors.InUse:
                     pass
 
-            pool_name = self._pool_name(context, pool_id)
+            pool_name = self._pool_name(pool_id)
             c.client.slb.service_group.update(pool_name, health_monitor="")

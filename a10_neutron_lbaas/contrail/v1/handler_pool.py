@@ -49,17 +49,18 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
         with a10.A10DeleteContext(self, pool) as c:
             for member in pool['members']:
                 # TODO(teamvnc) - replace with call to contrail ops.
-                m = self.neutron.member_get(member)
+                # m = self.neutron.member_get(member)
+                m = self.contrail.member_get(member)
                 self.a10_driver.member._delete(c, m)
 
             for hm in pool['health_monitors_status']:
                 # TODO(teamvnc) - replace with call to contrail ops.
-                z = self.neutron.hm_get(hm['monitor_id'])
+                z = self.contrail.hm_get(hm['monitor_id'])
                 self.a10_driver.hm._delete(c, z)
 
             if 'vip_id' in pool and pool['vip_id'] is not None:
                 # TODO(teamvnc) - replace with call to contrail ops.
-                vip = self.neutron.vip_get(pool['vip_id'])
+                vip = self.contrail.vip_get(pool['vip_id'])
                 self.a10_driver.vip._delete(c, vip)
 
             c.client.slb.service_group.delete(self._meta_name(pool))
@@ -70,8 +71,8 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
         with a10.A10Context(self, pool) as c:
             try:
                 # TODO(teamvnc) - replace with call to contrail ops.
-                vip_id = self.neutron.vip_get_id(pool['id'])
-                vip = self.neutron.vip_get(vip_id)
+                # vip_id = self.neutron.vip_get_id(pool['id'])
+                vip = self.contrail.vip_get(vip_id)
                 name = self.meta(vip, 'vip_name', vip['id'])
                 r = c.client.slb.virtual_server.stats(name)
                 return {

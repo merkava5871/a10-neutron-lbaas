@@ -28,8 +28,8 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
     def _meta_name(self, member, ip_address):
         return self.meta(member, 'name', self._get_name(member, ip_address))
 
-    def _create(self, c, context, member):
-        server_ip = self.neutron.member_get_ip(context, member,
+    def _create(self, c, member):
+        server_ip = self.neutron.member_get_ip(member,
                                                c.device_cfg['use_float'])
         server_name = self._meta_name(member, server_ip)
 
@@ -47,7 +47,7 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
         try:
             member_args = {'member': self.meta(member, 'member', {})}
             c.client.slb.service_group.member.create(
-                self._pool_name(context, member['pool_id']),
+                self._pool_name(member['pool_id']),
                 server_name,
                 member['protocol_port'],
                 status=status,
@@ -55,14 +55,14 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
         except acos_errors.Exists:
             pass
 
-    def create(self, context, member):
-        with a10.A10WriteStatusContext(self, context, member) as c:
-            self._create(c, context, member)
-            self.hooks.after_member_create(c, context, member)
+    def create(self, member):
+        with a10.A10WriteStatusContext(self, member) as c:
+            self._create(c, member)
+            self.hooks.after_member_create(c, member)
 
-    def update(self, context, old_member, member):
-        with a10.A10WriteStatusContext(self, context, member) as c:
-            server_ip = self.neutron.member_get_ip(context, member,
+    def update(self, old_member, member):
+        with a10.A10WriteStatusContext(self, member) as c:
+            server_ip = self.neutron.member_get_ip(member,
                                                    c.device_cfg['use_float'])
             server_name = self._meta_name(member, server_ip)
 
@@ -73,25 +73,26 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
             try:
                 member_args = {'member': self.meta(member, 'member', {})}
                 c.client.slb.service_group.member.update(
-                    self._pool_name(context, member['pool_id']),
+                    self._pool_name(member['pool_id']),
                     server_name,
                     member['protocol_port'],
                     status,
                     axapi_args=member_args)
             except acos_errors.NotFound:
                 # Adding db relation after the fact
-                self._create(c, context, member)
+                self._create(c, member)
 
-            self.hooks.after_member_update(c, context, member)
+            self.hooks.after_member_update(c, member)
 
-    def _delete(self, c, context, member):
-        server_ip = self.neutron.member_get_ip(context, member, c.device_cfg['use_float'])
+    def _delete(self, c, member):
+        # TODO(teamvnc) - replace with call to contrail ops.
+        server_ip = "127.0.0.1"
         server_name = self._meta_name(member, server_ip)
 
         try:
-            if self.neutron.member_count(context, member) > 1:
+            if self.neutron.member_count(member) > 1:
                 c.client.slb.service_group.member.delete(
-                    self._pool_name(context, member['pool_id']),
+                    self._pool_name(member['pool_id']),
                     server_name,
                     member['protocol_port'])
             else:
@@ -99,8 +100,8 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
         except acos_errors.NotFound:
             pass
 
-        self.hooks.after_member_delete(c, context, member)
+        self.hooks.after_member_delete(c, member)
 
-    def delete(self, context, member):
-        with a10.A10DeleteContext(self, context, member) as c:
-            self._delete(c, context, member)
+    def delete(self, member):
+        with a10.A10DeleteContext(self, member) as c:
+            self._delete(c, member)

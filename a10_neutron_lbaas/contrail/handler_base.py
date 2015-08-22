@@ -34,9 +34,9 @@ class HandlerBase(object):
     def _meta_name(self, lbaas_obj):
         return self.meta(lbaas_obj, 'name', self._name(lbaas_obj))
 
-    def _pool_name(self, context, pool_id=None, pool=None):
+    def _pool_name(self, pool_id=None, pool=None):
         if not pool:
-            pool = self.neutron.pool_get(context, pool_id)
+            pool = self.contrail.pool_get(pool_id)
         if not pool_id:
             pool_id = pool.id
         return self.meta(pool, 'name', pool_id)
