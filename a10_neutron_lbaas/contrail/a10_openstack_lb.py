@@ -14,67 +14,20 @@
 
 import logging
 
-import a10_config
+import a10_neutron_lbaas.a10_config
 import acos_client
 import plumbing_hooks as hooks
-import v1.handler_hm
-import v1.handler_member
-import v1.handler_pool
-import v1.handler_vip
-import v2.handler_hm
-import v2.handler_lb
-import v2.handler_listener
-import v2.handler_member
-import v2.handler_pool
+import a10_neutron_lbaas.contrail.v1.handler_hm
+import a10_neutron_lbaas.contrail.v1.handler_member
+import a10_neutron_lbaas.contrail.v1.handler_pool
+import a10_neutron_lbaas.contrail.v1.handler_vip
+from a10_neutron_lbaas import a10_openstack_lb as a10_lb
 import version
 
 LOG = logging.getLogger(__name__)
 
 
-class A10OpenstackLBBase(object):
-
-    def __init__(self, openstack_driver,
-                 plumbing_hooks_class=hooks.PlumbingHooks,
-                 neutron_hooks_module=None,
-                 barbican_client=None):
-        self.openstack_driver = openstack_driver
-        self.config = a10_config.A10Config()
-        self.neutron = neutron_hooks_module
-
-        LOG.info("A10-neutron-lbaas: initializing, version=%s, acos_client=%s",
-                 version.VERSION, acos_client.VERSION)
-
-        if self.config.verify_appliances:
-            self._verify_appliances()
-
-        self.hooks = plumbing_hooks_class(self)
-
-    def _select_a10_device(self, tenant_id):
-        return self.hooks.select_device(tenant_id)
-
-    def _get_a10_client(self, device_info):
-        d = device_info
-        return acos_client.Client(d['host'],
-                                  d.get('api_version', acos_client.AXAPI_21),
-                                  d['username'], d['password'],
-                                  port=d['port'], protocol=d['protocol'])
-
-    def _verify_appliances(self):
-        LOG.info("A10Driver: verifying appliances")
-
-        if len(self.config.devices) == 0:
-            LOG.error("A10Driver: no configured appliances")
-
-        for k, v in self.config.devices.items():
-            try:
-                LOG.info("A10Driver: appliance(%s) = %s", k,
-                         self._get_a10_client(v).system.information())
-            except Exception:
-                LOG.error("A10Driver: unable to connect to configured"
-                          "appliance, name=%s", k)
-
-
-class A10OpenstackContrailLBV1(A10OpenstackLBBase):
+class A10OpenstackContrailLBV1(a10_lb.A10OpenstackLBBase):
 
     @property
     def pool(self):

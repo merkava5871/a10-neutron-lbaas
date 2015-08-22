@@ -34,30 +34,29 @@ class TestVIP(test_base.UnitTestBase):
         return h.copy()
 
     def test_create(self):
-        self.a.vip.create(None, self.fake_vip())
+        self.a.vip.create(self.fake_vip())
         s = str(self.a.last_client.mock_calls)
         self.assertTrue('virtual_server.create' in s)
         self.assertTrue('1.1.1.1' in s)
         self.assertTrue('vport.create' in s)
         self.assertTrue('id1' in s)
         self.assertTrue('UP' in s)
-        self.a.openstack_driver.plugin.get_pool.assert_called_with(
-            None, 'pool1')
+        self.a.openstack_driver.plugin.get_pool.assert_called_with('pool1')
         self.assertTrue('HTTP' in s)
 
     def test_create_pers(self):
-        self.a.vip.create(None, self.fake_vip('HTTP_COOKIE'))
+        self.a.vip.create(self.fake_vip('HTTP_COOKIE'))
         s = str(self.a.last_client.mock_calls)
         self.assertTrue("c_pers_name='id1'" in s)
 
     def test_create_unsupported(self):
         try:
-            self.a.vip.create(None, self.fake_vip('APP_COOKIE'))
+            self.a.vip.create(self.fake_vip('APP_COOKIE'))
         except a10_ex.UnsupportedFeature:
             pass
 
     def test_update(self):
-        self.a.vip.update(None, self.fake_vip(), self.fake_vip())
+        self.a.vip.update(self.fake_vip(), self.fake_vip())
         self.print_mocks()
         s = str(self.a.last_client.mock_calls)
         self.assertTrue('vport.update' in s)
@@ -68,11 +67,11 @@ class TestVIP(test_base.UnitTestBase):
         self.assertTrue('HTTP' in s)
 
     def test_delete(self):
-        self.a.vip.delete(None, self.fake_vip())
+        self.a.vip.delete(self.fake_vip())
         self.a.last_client.slb.virtual_server.delete.assert_called_with('id1')
 
     def test_delete_pers(self):
-        self.a.vip.delete(None, self.fake_vip('SOURCE_IP'))
+        self.a.vip.delete(self.fake_vip('SOURCE_IP'))
         self.a.last_client.slb.virtual_server.delete.assert_called_with('id1')
         z = self.a.last_client.slb.template.src_ip_persistence.delete
         z.assert_called_with('id1')

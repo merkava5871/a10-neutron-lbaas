@@ -26,15 +26,15 @@ LOG = logging.getLogger(__name__)
 
 class VipHandler(handler_base_v1.HandlerBaseV1):
 
-    def create(self, context, vip):
-        with a10.A10WriteStatusContext(self, context, vip) as c:
+    def create(self, vip):
+        with a10.A10WriteStatusContext(self, vip) as c:
             status = c.client.slb.UP
             if not vip['admin_state_up']:
                 status = c.client.slb.DOWN
 
-            pool_name = self._pool_name(context, vip['pool_id'])
+            pool_name = self._pool_name(vip['pool_id'])
 
-            p = PersistHandler(c, context, vip, self._meta_name(vip))
+            p = PersistHandler(c, vip, self._meta_name(vip))
             p.create()
 
             templates = self.meta(vip, "template", {})
@@ -108,17 +108,17 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
                 except acos_errors.Exists:
                     pass
 
-            self.hooks.after_vip_create(c, context, vip)
+            self.hooks.after_vip_create(c,  vip)
 
-    def update(self, context, old_vip, vip):
-        with a10.A10WriteStatusContext(self, context, vip) as c:
+    def update(self, old_vip, vip):
+        with a10.A10WriteStatusContext(self, vip) as c:
             status = c.client.slb.UP
             if not vip['admin_state_up']:
                 status = c.client.slb.DOWN
 
-            pool_name = self._pool_name(context, vip['pool_id'])
+            pool_name = self._pool_name( vip['pool_id'])
 
-            p = PersistHandler(c, context, vip, self._meta_name(vip))
+            p = PersistHandler(c,  vip, self._meta_name(vip))
             p.create()
 
             templates = self.meta(vip, "template", {})
@@ -147,23 +147,22 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
                 status=status,
                 axapi_args=vport_args)
 
-            self.hooks.after_vip_update(c, context, vip)
+            self.hooks.after_vip_update(c,  vip)
 
-    def _delete(self, c, context, vip):
+    def _delete(self, c,  vip):
         c.client.slb.virtual_server.delete(self._meta_name(vip))
-        PersistHandler(c, context, vip, self._meta_name(vip)).delete()
+        PersistHandler(c, vip, self._meta_name(vip)).delete()
 
-    def delete(self, context, vip):
-        with a10.A10DeleteContext(self, context, vip) as c:
-            self._delete(c, context, vip)
-            self.hooks.after_vip_delete(c, context, vip)
+    def delete(self, vip):
+        with a10.A10DeleteContext(self, vip) as c:
+            self._delete(c, vip)
+            self.hooks.after_vip_delete(c, vip)
 
 
 class PersistHandler(object):
 
-    def __init__(self, c, context, vip, vip_name):
+    def __init__(self, c, vip, vip_name):
         self.c = c
-        self.context = context
         self.vip = vip
         self.c_pers = None
         self.s_pers = None
