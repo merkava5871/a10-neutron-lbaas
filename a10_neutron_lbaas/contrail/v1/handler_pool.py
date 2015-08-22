@@ -23,8 +23,7 @@ LOG = logging.getLogger(__name__)
 
 
 class PoolHandler(handler_base_v1.HandlerBaseV1):
-
-    def _set(self, set_method, c, context, pool):
+    def _set(self, set_method, c, pool):
         args = {'service_group': self.meta(pool, 'service_group', {})}
 
         set_method(
@@ -33,42 +32,46 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
             lb_method=a10_os.service_group_lb_method(c, pool['lb_method']),
             axapi_args=args)
 
-    def create(self, context, pool):
-        with a10.A10WriteStatusContext(self, context, pool) as c:
+    def create(self, pool):
+        with a10.A10WriteStatusContext(self, pool) as c:
             try:
                 self._set(c.client.slb.service_group.create,
                           c, context, pool)
             except acos_errors.Exists:
                 pass
 
-    def update(self, context, old_pool, pool):
-        with a10.A10WriteStatusContext(self, context, pool) as c:
+    def update(self, old_pool, pool):
+        with a10.A10WriteStatusContext(self, pool) as c:
             self._set(c.client.slb.service_group.update,
                       c, context, pool)
 
-    def delete(self, context, pool):
-        with a10.A10DeleteContext(self, context, pool) as c:
+    def delete(self, pool):
+        with a10.A10DeleteContext(self, pool) as c:
             for member in pool['members']:
+                # TODO(teamvnc) - replace with call to contrail ops.
                 m = self.neutron.member_get(context, member)
-                self.a10_driver.member._delete(c, context, m)
+                self.a10_driver.member._delete(c, m)
 
             for hm in pool['health_monitors_status']:
+                # TODO(teamvnc) - replace with call to contrail ops.
                 z = self.neutron.hm_get(context, hm['monitor_id'])
                 self.a10_driver.hm._delete(c, context, z)
 
             if 'vip_id' in pool and pool['vip_id'] is not None:
-                vip = self.neutron.vip_get(context, pool['vip_id'])
-                self.a10_driver.vip._delete(c, context, vip)
+                # TODO(teamvnc) - replace with call to contrail ops.
+                vip = self.neutron.vip_get(pool['vip_id'])
+                self.a10_driver.vip._delete(c, vip)
 
             c.client.slb.service_group.delete(self._meta_name(pool))
 
-    def stats(self, context, pool_id):
-        tenant_id = self.neutron.pool_get_tenant_id(context, pool_id)
+    def stats(self, pool_id):
+        tenant_id = self.neutron.pool_get_tenant_id(pool_id)
         pool = {'id': pool_id, 'tenant_id': tenant_id}
-        with a10.A10Context(self, context, pool) as c:
+        with a10.A10Context(self, pool) as c:
             try:
-                vip_id = self.neutron.vip_get_id(context, pool['id'])
-                vip = self.neutron.vip_get(context, vip_id)
+                # TODO(teamvnc) - replace with call to contrail ops.
+                vip_id = self.neutron.vip_get_id(pool['id'])
+                vip = self.neutron.vip_get(vip_id)
                 name = self.meta(vip, 'vip_name', vip['id'])
                 r = c.client.slb.virtual_server.stats(name)
                 return {

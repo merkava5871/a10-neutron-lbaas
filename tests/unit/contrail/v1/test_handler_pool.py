@@ -70,6 +70,8 @@ class TestPools(test_base.UnitTestBase):
             pool['id'],
             lb_method=self.a.last_client.slb.service_group.ROUND_ROBIN,
             protocol=self.a.last_client.slb.service_group.TCP)
+        self.assertTrue(self.a.last_client.slb.service_group.create.called)
+        self.assertTrue('ROUND_ROBIN' in str(self.a.last_client.mock_calls))
 
     def test_delete(self):
         pool = self.fake_pool('TCP', 'LEAST_CONNECTIONS')
