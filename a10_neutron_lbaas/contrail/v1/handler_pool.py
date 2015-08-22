@@ -66,7 +66,7 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
             c.client.slb.service_group.delete(self._meta_name(pool))
 
     def stats(self, pool_id):
-        tenant_id = self.neutron.pool_get_tenant_id(pool_id)
+        tenant_id = self.contrail.pool_get_tenant_id(pool_id)
         pool = {'id': pool_id, 'tenant_id': tenant_id}
         with a10.A10Context(self, pool) as c:
             try:

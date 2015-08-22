@@ -52,21 +52,22 @@ class TestHM(test_base.UnitTestBase):
         hm['pools'] = [{'pool_id': 'p02'}, {'pool_id': 'p01'}]
         self.a.hm.create(hm, 'p01')
         self.assert_hm(self.a.last_client.slb.hm.TCP, None, None, None)
-        pool_name = self.a.hm._pool_name(None, 'p02')
+        pool_name = self.a.hm._pool_name('p02')
         self.a.last_client.slb.service_group.update.assert_called_with(
             pool_name, health_monitor='abcdef')
 
     def test_create_http(self):
-        self.a.hm.create(self.fake_hm('HTTP'), 'p01')
+        hm = self.fake_hm('HTTP')
+        self.a.hm.create(hm, 'p01')
         self.assert_hm(self.a.last_client.slb.hm.HTTP, 'GET', '/', '200')
-        pool_name = self.a.hm._pool_name(None, 'p01')
+        pool_name = self.a.hm._pool_name('p01')
         self.a.last_client.slb.service_group.update.assert_called_with(
             pool_name, health_monitor='abcdef')
 
     def test_create_https(self):
         self.a.hm.create(self.fake_hm('HTTPS'), 'p01')
         self.assert_hm(self.a.last_client.slb.hm.HTTPS, 'GET', '/', '200')
-        pool_name = self.a.hm._pool_name(None, 'p01')
+        pool_name = self.a.hm._pool_name('p01')
         self.a.last_client.slb.service_group.update.assert_called_with(
             pool_name, health_monitor='abcdef')
 
@@ -85,6 +86,6 @@ class TestHM(test_base.UnitTestBase):
 
     def test_delete(self):
         self.a.hm.delete(self.fake_hm('HTTP'), 'p01')
-        pool_name = self.a.hm._pool_name(None, 'p01')
+        pool_name = self.a.hm._pool_name('p01')
         self.a.last_client.slb.service_group.update.assert_called_with(
             pool_name, health_monitor='')

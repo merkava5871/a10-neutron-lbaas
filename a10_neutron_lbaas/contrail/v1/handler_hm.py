@@ -68,14 +68,15 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
         with a10.A10WriteHMStatusContext(self, h) as c:
             self._set(c, c.client.slb.hm.update, hm)
 
-    def _delete(self, c, context, hm):
+    def _delete(self, c, hm):
         c.client.slb.hm.delete(self._meta_name(hm))
 
     def delete(self, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
         with a10.A10DeleteHMContext(self, h) as c:
-            # TODO(tyeamvnc) - Replace with call to contrail ops
+            # TODO(teamvnc) - Replace with call to contrail ops
+            # TODO(teamvnc) - DON'T RETURN STATIC VALUE HERE
             if False: # self.neutron.hm_binding_count(hm['id']) <= 1:
                 try:
                     self._delete(c, hm)

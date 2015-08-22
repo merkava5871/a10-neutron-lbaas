@@ -46,7 +46,7 @@ class UnitTestBase(unittest.TestCase):
         unit_config = os.path.join(unit_dir, "unit_config")
         os.environ['A10_CONFIG_DIR'] = unit_config
         self.a = FakeA10OpenstackContrailLBV1(None)
-        
+
     def print_mocks(self):
         print("OPENSTACK ", self.a.openstack_driver.mock_calls)
         print("CLIENT ", self.a.last_client.mock_calls)

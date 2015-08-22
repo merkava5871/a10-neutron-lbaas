@@ -87,9 +87,9 @@ class TestPools(test_base.UnitTestBase):
     def test_stats(self):
         pool = self.fake_pool('TCP', 'LEAST_CONNECTIONS')
         z = self.a.pool
-        z.neutron.pool_get_tenant_id = lambda x, y: 'hello'
+        z.contrail.pool_get_tenant_id = lambda x: 'hello'
         z._get_vip_id = lambda x, y: '2.2.2.2'
-        z.stats(None, pool['id'])
+        z.stats(pool['id'])
         self.print_mocks()
         s = str(self.a.last_client.mock_calls)
-        self.assertTrue(s.index('slb.virtual_server.stats') >= 0)
+        self.assertTrue('slb.virtual_server.stats' in s)

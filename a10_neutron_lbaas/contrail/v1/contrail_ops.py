@@ -19,15 +19,15 @@ class ContrailOpsV1(object):
 
     def hm_binding_count(self, hm_id):
         # return self.openstack_driver._hm_binding_count(context, hm_id)
-        return 0
+        return {"id": hm_id, "tenant_id": "1223"}
 
     def hm_get(self, hm_id):
         # return self.openstack_driver._pool_get_hm(context, hm_id)
-        return {}
+        return {"id": hm_id, "tenant_id": "1223"}
 
     def member_get_ip(self, member, use_float=False):
         # return self.openstack_driver._member_get_ip(context, member, use_float)
-        return {}
+        return "127.0.0.1"
 
     def member_count(self, member):
         # return self.openstack_driver._member_count(context, member)
@@ -36,21 +36,22 @@ class ContrailOpsV1(object):
     def member_get(self, member_id):
         # return self.openstack_driver._member_get(context, member_id)
         return {
-            "id": member_id
+            "id": member_id,
+            "tenant_id": "1123"
         }
 
     def pool_get(self, pool_id):
         # return self.plugin.get_pool(context, pool_id)
-        return {"id" : pool_id}
+        return {"id" : pool_id, "tenant_id": "1223"}
 
     def pool_get_tenant_id(self, pool_id):
         # return self.openstack_driver._pool_get_tenant_id(context, pool_id)
-        return {}
+        return {"id": pool_id, "tenant_id": "1223"}
 
     def vip_get(self, vip_id):
         # return self.plugin.get_vip(context, vip_id)
-        return {}
+        return {"id": vip_id, "tenant_id": "1223"}
 
     def vip_get_id(self, pool_id):
         #return self.openstack_driver._pool_get_vip_id(context, pool_id)
-        return {}
+        return {"id": pool_id, "tenant_id": "1223"}
