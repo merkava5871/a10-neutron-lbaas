@@ -56,7 +56,7 @@ class TestMembers(test_base.UnitTestBase):
     def test_count(self):
         self.a.member.contrail.member_count(self.fake_member())
 
-    def fake_member(pool_id='pool1', admin_state_up=True):
+    def fake_member(self, pool_id='pool1', admin_state_up=True):
         return _fake_member(pool_id, admin_state_up)
 
     def test_create(self, admin_state_up=True):
@@ -75,7 +75,7 @@ class TestMembers(test_base.UnitTestBase):
         pool_name = self.a.member._pool_name(m['pool_id'])
         self.a.last_client.slb.service_group.member.create.assert_called_with(
             pool_name, name, m['protocol_port'], status=status,
-            axapi_args= {'member': {}})
+            axapi_args={'member': {}})
 
     def test_create_down(self):
         self.test_create(False)
@@ -102,13 +102,16 @@ class TestMembers(test_base.UnitTestBase):
         self.a.last_client.slb.server.delete(ip)
 
     def test_delete_count_gt_one(self):
+        # import pdb
+        # pdb.set_trace()
         m = self.fake_member()
-        ip = self.a.member.contrail.member_get_ip(m, True)
-        name = self.a.member._get_name(m, ip)
-
+        handler = self.a.member
+        ip = handler.contrail.member_get_ip(m, True)
+        name = handler._get_name(m, ip)
+        handler.contrail.member_count = (lambda x: 2)
         self.set_count_2()
-        self.a.member.delete(m)
+        handler.delete(m)
 
-        pool_name = self.a.member._pool_name(m['pool_id'])
+        pool_name = handler._pool_name(m['pool_id'])
         self.a.last_client.slb.service_group.member.delete.assert_called_with(
             pool_name, name, m['protocol_port'])

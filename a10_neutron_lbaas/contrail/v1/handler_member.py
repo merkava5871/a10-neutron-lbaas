@@ -30,7 +30,7 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
 
     def _create(self, c, member):
         server_ip = self.contrail.member_get_ip(member,
-                                               c.device_cfg['use_float'])
+                                                c.device_cfg['use_float'])
         server_name = self._meta_name(member, server_ip)
 
         status = c.client.slb.UP
@@ -63,7 +63,7 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
     def update(self, old_member, member):
         with a10.A10WriteStatusContext(self, member) as c:
             server_ip = self.contrail.member_get_ip(member,
-                                                   c.device_cfg['use_float'])
+                                                    c.device_cfg['use_float'])
             server_name = self._meta_name(member, server_ip)
 
             status = c.client.slb.UP
