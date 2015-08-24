@@ -41,7 +41,7 @@ class TestVIP(test_base.UnitTestBase):
         self.assertTrue('vport.create' in s)
         self.assertTrue('id1' in s)
         self.assertTrue('UP' in s)
-        self.a.openstack_driver.plugin.get_pool.assert_called_with('pool1')
+        self.a.openstack_driver.plugin.get_pool.assert_called_with('pool1', None)
         self.assertTrue('HTTP' in s)
 
     def test_create_pers(self):
@@ -62,7 +62,7 @@ class TestVIP(test_base.UnitTestBase):
         self.assertTrue('vport.update' in s)
         self.assertTrue('id1' in s)
         self.assertTrue('UP' in s)
-        self.a.openstack_driver.plugin.get_pool.assert_called_with('pool1')
+        self.a.openstack_driver.plugin.get_pool.assert_called_with('pool1', None)
         self.assertTrue('HTTP' in s)
 
     def test_delete(self):

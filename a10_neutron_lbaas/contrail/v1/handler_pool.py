@@ -70,9 +70,8 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
         pool = {'id': pool_id, 'tenant_id': tenant_id}
         with a10.A10Context(self, pool) as c:
             try:
-                # TODO(teamvnc) - replace with call to contrail ops.
-                # vip_id = self.neutron.vip_get_id(pool['id'])
-                vip = self.contrail.vip_get(vip_id)
+                vip_id = self.contrail.vip_get_id(c.openstack_context, pool['id'])
+                vip = self.contrail.vip_get(c.openstack_context, vip_id)
                 name = self.meta(vip, 'vip_name', vip['id'])
                 r = c.client.slb.virtual_server.stats(name)
                 return {
