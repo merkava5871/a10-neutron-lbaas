@@ -13,45 +13,33 @@
 
 class ContrailOpsV1(object):
 
-    def __init__(self, handler):
+    def __init__(self, handler, openstack_context=None):
         self.openstack_driver = handler.openstack_driver
         self.plugin = self.openstack_driver.plugin
 
-    def hm_binding_count(self, hm_id):
-        # return self.openstack_driver._hm_binding_count(context, hm_id)
-        return {"id": hm_id, "tenant_id": "1223"}
+    def hm_binding_count(self, context, hm_id):
+        return self.openstack_driver._hm_binding_count(context, hm_id)
 
-    def hm_get(self, hm_id):
-        # return self.openstack_driver._pool_get_hm(context, hm_id)
-        return {"id": hm_id, "tenant_id": "1223"}
+    def hm_get(self, context, hm_id):
+        return self.openstack_driver._pool_get_hm(context, hm_id)
 
-    def member_get_ip(self, member, use_float=False):
-        # return self.openstack_driver._member_get_ip(context, member, use_float)
-        return "127.0.0.1"
+    def member_get_ip(self, context, member, use_float=False):
+        return self.openstack_driver._member_get_ip(context, member, use_float)
 
-    def member_count(self, member):
-        # return self.openstack_driver._member_count(context, member)
-        return 0
+    def member_count(self, context, member):
+        return self.openstack_driver._member_count(context, member)
 
-    def member_get(self, member_id):
-        # return self.openstack_driver._member_get(context, member_id)
-        return {
-            "id": member_id,
-            "tenant_id": "1123"
-        }
+    def member_get(self, context, member_id):
+        return self.openstack_driver._member_get(context, member_id)
 
-    def pool_get(self, pool_id):
-        # return self.plugin.get_pool(context, pool_id)
-        return {"id" : pool_id, "tenant_id": "1223"}
+    def pool_get(self, context, pool_id):
+        return self.plugin.get_pool(context, pool_id)
 
-    def pool_get_tenant_id(self, pool_id):
-        # return self.openstack_driver._pool_get_tenant_id(context, pool_id)
-        return {"id": pool_id, "tenant_id": "1223"}
+    def pool_get_tenant_id(self, context, pool_id):
+        return self.openstack_driver._pool_get_tenant_id(context, pool_id)
 
-    def vip_get(self, vip_id):
-        # return self.plugin.get_vip(context, vip_id)
-        return {"id": vip_id, "tenant_id": "1223"}
+    def vip_get(self, context, vip_id):
+        return self.plugin.get_vip(context, vip_id)
 
-    def vip_get_id(self, pool_id):
-        #return self.openstack_driver._pool_get_vip_id(context, pool_id)
-        return {"id": pool_id, "tenant_id": "1223"}
+    def vip_get_id(self, context, pool_id):
+        return self.openstack_driver._pool_get_vip_id(context, pool_id)

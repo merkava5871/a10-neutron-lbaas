@@ -29,7 +29,8 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
         return self.meta(member, 'name', self._get_name(member, ip_address))
 
     def _create(self, c, member):
-        server_ip = self.contrail.member_get_ip(member,
+        server_ip = self.contrail.member_get_ip(c.openstack_context,
+                                                member,
                                                 c.device_cfg['use_float'])
         server_name = self._meta_name(member, server_ip)
 
@@ -62,7 +63,8 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
 
     def update(self, old_member, member):
         with a10.A10WriteStatusContext(self, member) as c:
-            server_ip = self.contrail.member_get_ip(member,
+            server_ip = self.contrail.member_get_ip(c.openstack_context,
+                                                    member,
                                                     c.device_cfg['use_float'])
             server_name = self._meta_name(member, server_ip)
 
@@ -90,7 +92,7 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
         server_name = self._meta_name(member, server_ip)
 
         try:
-            if self.contrail.member_count(member) > 1:
+            if self.contrail.member_count(c.openstack_context, member) > 1:
                 c.client.slb.service_group.member.delete(
                     self._pool_name(member['pool_id']),
                     server_name,

@@ -21,7 +21,7 @@ import v1.handler_hm
 import v1.handler_member
 import v1.handler_pool
 import v1.handler_vip
-from a10_neutron_lbaas import a10_openstack_lb as a10_lb
+
 import version
 
 LOG = logging.getLogger(__name__)
@@ -31,13 +31,13 @@ class A10OpenstackContrailLBBase(object):
 
     def __init__(self, openstack_driver,
                  plumbing_hooks_class=hooks.PlumbingHooks,
-                 neutron_hooks_module=None,
+                 contrail_hooks_module=None,
                  barbican_client=None):
         self.openstack_driver = openstack_driver
         self.config = a10_config.A10Config()
-        self.neutron = neutron_hooks_module
+        self.contrail = contrail_hooks_module
 
-        LOG.info("A10-neutron-lbaas: initializing, version=%s, acos_client=%s",
+        LOG.info("A10-neutron-lbaas.contrail: initializing, version=%s, acos_client=%s",
                  version.VERSION, acos_client.VERSION)
 
         if self.config.verify_appliances:
@@ -56,7 +56,7 @@ class A10OpenstackContrailLBBase(object):
                                   port=d['port'], protocol=d['protocol'])
 
     def _verify_appliances(self):
-        LOG.info("A10Driver: verifying appliances")
+        LOG.info("CONTRAIL A10Driver: verifying appliances")
 
         if len(self.config.devices) == 0:
             LOG.error("A10Driver: no configured appliances")

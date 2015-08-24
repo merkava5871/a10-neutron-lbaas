@@ -44,8 +44,8 @@ class TestMembers(test_base.UnitTestBase):
 
     def test_get_ip(self):
         m = self.fake_member()
-        self.a.member.contrail.member_get_ip(m, False)
-        self.a.openstack_driver._member_get_ip.assert_called_with(
+        self.a.member.contrail.member_get_ip(None, m, False)
+        self.a.openstack_driver._member_get_ip.assert_called_with(None,
             m, False)
 
     def test_get_name(self):
@@ -54,7 +54,7 @@ class TestMembers(test_base.UnitTestBase):
         self.assertEqual(z, '_ten1_1_1_1_1_neutron')
 
     def test_count(self):
-        self.a.member.contrail.member_count(self.fake_member())
+        self.a.member.contrail.member_count(None, self.fake_member())
 
     def fake_member(self, pool_id='pool1', admin_state_up=True):
         return _fake_member(pool_id, admin_state_up)
@@ -106,9 +106,11 @@ class TestMembers(test_base.UnitTestBase):
         # pdb.set_trace()
         m = self.fake_member()
         handler = self.a.member
+        handler.contrail.member_get_ip = (lambda x, y: "127.0.0.1")
         ip = handler.contrail.member_get_ip(m, True)
         name = handler._get_name(m, ip)
-        handler.contrail.member_count = (lambda x: 2)
+        handler.contrail.member_count = (lambda x, y: 2)
+        
         self.set_count_2()
         handler.delete(m)
 

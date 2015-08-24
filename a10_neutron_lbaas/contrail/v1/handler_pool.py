@@ -50,12 +50,12 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
             for member in pool['members']:
                 # TODO(teamvnc) - replace with call to contrail ops.
                 # m = self.neutron.member_get(member)
-                m = self.contrail.member_get(member)
+                m = self.contrail.member_get(c.openstack_context, member)
                 self.a10_driver.member._delete(c, m)
 
             for hm in pool['health_monitors_status']:
                 # TODO(teamvnc) - replace with call to contrail ops.
-                z = self.contrail.hm_get(hm['monitor_id'])
+                z = self.contrail.hm_get(c.openstack_context, hm['monitor_id'])
                 self.a10_driver.hm._delete(c, z)
 
             if 'vip_id' in pool and pool['vip_id'] is not None:

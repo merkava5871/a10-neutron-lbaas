@@ -52,7 +52,7 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
 
             if pool_id is not None:
                 c.client.slb.service_group.update(
-                    self._pool_name(pool_id),
+                    self._pool_name(c.openstack_context, pool_id),
                     health_monitor=self._meta_name(hm))
 
             for pool in hm['pools']:
@@ -69,7 +69,7 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
             self._set(c, c.client.slb.hm.update, hm)
 
     def _delete(self, c, hm):
-        c.client.slb.hm.delete(self._meta_name(hm))
+        c.client.slb.hm.delete(c.openstack_context, self._meta_name(hm))
 
     def delete(self, hm, pool_id):
         h = hm.copy()
@@ -77,11 +77,11 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
         with a10.A10DeleteHMContext(self, h) as c:
             # TODO(teamvnc) - Replace with call to contrail ops
             # TODO(teamvnc) - DON'T RETURN STATIC VALUE HERE
-            if False: # self.neutron.hm_binding_count(hm['id']) <= 1:
+            if self.contrail.hm_binding_count(c.openstack_context, hm['id']) <= 1:
                 try:
                     self._delete(c, hm)
                 except acos_errors.InUse:
                     pass
 
-            pool_name = self._pool_name(pool_id)
+            pool_name = self._pool_name(c.openstack_context, pool_id)
             c.client.slb.service_group.update(pool_name, health_monitor="")

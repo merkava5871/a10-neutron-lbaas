@@ -20,4 +20,4 @@ class HandlerBaseV1(handler_base.HandlerBase):
 
     def __init__(self, a10_driver):
         super(HandlerBaseV1, self).__init__(a10_driver)
-        self.contrail = contrail_ops.ContrailOpsV1(self)
+        self.contrail = contrail_ops.ContrailOpsV1(self, self.openstack_driver)

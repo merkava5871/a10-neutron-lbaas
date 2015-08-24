@@ -41,11 +41,12 @@ class TestHM(test_base.UnitTestBase):
         return hm.copy()
 
     def test_create_ping(self):
-        self.a.hm.create(self.fake_hm('PING'), 'p01')
+        pool_id = "p01"
+        self.a.hm.create(self.fake_hm('PING'), pool_id)
         self.assert_hm(self.a.last_client.slb.hm.ICMP, None, None, None)
-        pool_name = self.a.hm._pool_name('p01')
+        self.a.hm._pool_name(pool_id)
         self.a.last_client.slb.service_group.update.assert_called_with(
-            pool_name, health_monitor='abcdef')
+            pool_id, health_monitor='abcdef')
 
     def test_create_tcp(self):
         hm = self.fake_hm('TCP')
@@ -58,18 +59,25 @@ class TestHM(test_base.UnitTestBase):
 
     def test_create_http(self):
         hm = self.fake_hm('HTTP')
-        self.a.hm.create(hm, 'p01')
+        handler = self.a.hm
+        pool_id = "p01"
+        handler.create(hm, pool_id)
         self.assert_hm(self.a.last_client.slb.hm.HTTP, 'GET', '/', '200')
-        pool_name = self.a.hm._pool_name('p01')
+
+        handler._pool_name(pool_id)
         self.a.last_client.slb.service_group.update.assert_called_with(
-            pool_name, health_monitor='abcdef')
+            pool_id, health_monitor='abcdef')
 
     def test_create_https(self):
-        self.a.hm.create(self.fake_hm('HTTPS'), 'p01')
+        handler = self.a.hm
+
+        pool_id = "p01"
+
+        handler.create(self.fake_hm('HTTPS'), pool_id)
         self.assert_hm(self.a.last_client.slb.hm.HTTPS, 'GET', '/', '200')
-        pool_name = self.a.hm._pool_name('p01')
+        handler._pool_name('p01')
         self.a.last_client.slb.service_group.update.assert_called_with(
-            pool_name, health_monitor='abcdef')
+            pool_id, health_monitor='abcdef')
 
     def test_update_tcp(self, m_old=None, m=None):
         if m_old is None:
@@ -85,7 +93,8 @@ class TestHM(test_base.UnitTestBase):
             axapi_args={})
 
     def test_delete(self):
-        self.a.hm.delete(self.fake_hm('HTTP'), 'p01')
-        pool_name = self.a.hm._pool_name('p01')
+        pool_id = "p01"
+        self.a.hm.delete(self.fake_hm('HTTP'), pool_id)
+        self.a.hm._pool_name(pool_id)
         self.a.last_client.slb.service_group.update.assert_called_with(
-            pool_name, health_monitor='')
+            pool_id, health_monitor='')
