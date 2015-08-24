@@ -21,6 +21,7 @@ import a10_neutron_lbaas.a10_openstack_lb as a10_os
 import a10_neutron_lbaas.plumbing_hooks as hooks
 
 
+
 class FakeA10OpenstackLBV1(a10_os.A10OpenstackLBV1):
 
     def __init__(self, openstack_driver):
@@ -57,7 +58,6 @@ class FakeA10OpenstackLBV2(a10_os.A10OpenstackLBV2):
         self.last_client = self._get_a10_client(self.device_info)
         return self.last_client
 
-
 class UnitTestBase(unittest.TestCase):
 
     def setUp(self):
@@ -68,6 +68,7 @@ class UnitTestBase(unittest.TestCase):
             self.a = FakeA10OpenstackLBV2(None)
         else:
             self.a = FakeA10OpenstackLBV1(None)
+
 
     def print_mocks(self):
         print("OPENSTACK ", self.a.openstack_driver.mock_calls)

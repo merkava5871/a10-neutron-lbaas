@@ -13,8 +13,8 @@
 #    under the License.
 
 import acos_client.errors as acos_errors
-import handler_base_v1
-import v1_context as a10
+import a10_neutron_lbaas.contrail.v1.handler_base_v1 as handler_base_v1
+import a10_neutron_lbaas.contrail.v1.v1_context as a10
 
 
 class MemberHandler(handler_base_v1.HandlerBaseV1):

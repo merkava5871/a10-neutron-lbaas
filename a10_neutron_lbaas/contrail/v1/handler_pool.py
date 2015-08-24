@@ -16,8 +16,8 @@ import logging
 
 from a10_neutron_lbaas import a10_openstack_map as a10_os
 import acos_client.errors as acos_errors
-import handler_base_v1
-import v1_context as a10
+import a10_neutron_lbaas.contrail.v1.handler_base_v1 as handler_base_v1
+import a10_neutron_lbaas.contrail.v1.v1_context as a10
 
 LOG = logging.getLogger(__name__)
 

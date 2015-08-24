@@ -75,7 +75,7 @@ class TestMembers(test_base.UnitTestBase):
         pool_name = self.a.member._pool_name(None, m['pool_id'])
         self.a.last_client.slb.service_group.member.create.assert_called_with(
             pool_name, name, m['protocol_port'], status=status,
-            axapi_args={'member': {}})
+            axapi_args= {'member': {}})
 
     def test_create_down(self):
         self.test_create(False)
