@@ -1,5 +1,9 @@
 #! /bin/bash
 export OS_USERNAME="demo"
-export OS_PASSWORD="demo"
+export OS_PASSWORD="contrail123"
+export OS_TENANT_NAME="demo"
 export OS_PROJECT_NAME="demo"
 export OS_PROJECT_DOMAIN_NAME="Default"
+export OS_AUTH_URL="http://localhost:35357/v2.0"
+export OS_USER_DOMAIN_NAME="Default"
+export OS_AUTH_VERSION="v2"
