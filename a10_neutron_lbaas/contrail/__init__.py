@@ -13,4 +13,3 @@
 #    under the License.
 # flake8: noqa
 
-# from a10_openstack_lb import A10OpenstackContrailLBV1 

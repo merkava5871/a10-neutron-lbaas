@@ -13,7 +13,7 @@
 #    under the License.
 
 import svc_monitor.services.loadbalancer.drivers.abstract_driver as abstract_driver
-import vnc_api.vnc_api import *
+from vnc_api.vnc_api import *
 from svc_monitor import db
 
 class ThunderContrailDriver(abstract_driver.ContrailLoadBalancerAbstractDriver):
