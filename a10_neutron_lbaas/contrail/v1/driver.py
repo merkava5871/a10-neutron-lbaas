@@ -16,7 +16,7 @@ import svc_monitor.services.loadbalancer.drivers.abstract_driver as abstract_dri
 from vnc_api.vnc_api import *
 from svc_monitor import db
 
-class ThunderContrailDriver(abstract_driver.ContrailLoadBalancerAbstractDriver):
+class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstractDriver):
     def __init__(self, name, manager, api, db, args=None):
         self._name = name
         self._api = api
