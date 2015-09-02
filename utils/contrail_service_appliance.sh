@@ -1,4 +1,5 @@
 #! /bin/bash
+# This script creates a driver in contrail's config DB based on the variables set below
 VNC_CMD_BASE=/opt/stack/contrail/controller/src/config/utils
 VNC_TENANT=admin
 VNC_USER=admin
