@@ -32,7 +32,7 @@ class TestA10Context(test_base.UnitTestBase):
         self.get_admin_patch = mock.patch("neutron.context.get_admin_context")
         self.get_admin_mock = self.get_admin_patch.start()
 
-        self.handler = self.a.pool
+        self.handler = self.a.pool_handler
         self.m = {'id': 'fake-id-001', 'tenant_id': 'faketen1'}
 
     def test_context(self):

@@ -12,9 +12,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import svc_monitor.services.loadbalancer.drivers.abstract_driver as abstract_driver
+from svc_monitor.services.loadbalancer.drivers import abstract_driver
 from vnc_api.vnc_api import *
 import v1_context as a10
+
+from a10_neutron_lbaas.contrail import a10_config
+from a10_neutron_lbaas.contrail.v1 import handler_pool
+from a10_neutron_lbaas.contrail.v1 import handler_vip
+from a10_neutron_lbaas.contrail.v1 import handler_member
+from a10_neutron_lbaas.contrail.v1 import handler_hm
 
 LOADBALANCER_SERVICE_TEMPLATE = {
     "default-domain",
@@ -29,6 +35,10 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
         self._svc_mon = manager
         self._args = args
         self.db = db
+        self.config = a10_config.A10Config()
+
+    def _select_a10_device(self, tenant_id):
+        return self.plumbing_hooks.select_device(tenant_id)
 
     def _get_template(self):
         if self._lb_template is not None:
@@ -57,7 +67,7 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
         fq_name = pool.get_fq_name()[:-1]
         fq_name.append(pool_id)
 
-        props = self._get_instance_properties(pool, vip)
+        props = service_instance._get_instance_properties(pool, vip)
         if props is None:
             try:
                 self._api.service_instance_delete(fq_name=fq_name)
@@ -91,7 +101,7 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
             return
         si_id = driver_data['service_instance']
         try:
-            service_instance  = self._api.service_instance.read(id=si_id)
+            service_instance = self._api.service_instance.read(id=si_id)
         except NoIdError as ex:
             self._svc_manager.logger.log_error(str(ex))
             return

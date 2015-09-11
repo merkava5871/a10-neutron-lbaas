@@ -17,20 +17,35 @@ import unittest
 
 import mock
 
-import a10_neutron_lbaas.a10_openstack_lb as a10_os
-import a10_neutron_lbaas.contrail.a10_openstack_lb as vnc_os
+import a10_neutron_lbaas.contrail.v1.driver as a10_vnc
 import a10_neutron_lbaas.contrail.plumbing_hooks as hooks
 
 
-class FakeA10OpenstackContrailLBV1(vnc_os.A10OpenstackContrailLBV1):
+class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
 
-    def __init__(self, openstack_driver):
-        super(FakeA10OpenstackContrailLBV1, self).__init__(mock.MagicMock())
+    def __init__(self, name, manager, api, db, args=None):
+        super(FakeA10ContrailLoadBalancerDriver, self).__init__(name, manager, api, db, args)
+        self.device_info = {
+            "name": "ax1",
+            "host": "10.10.100.20",
+            "port": 8443,
+            "protocol": "https",
+            "username": "admin",
+            "password": "a10",
+            "status": True,
+            "autosnat": True,
+            "api_version": "2.1",
+            "v_method": "LSI",
+            "max_instance": 5000,
+            "use_float": True,
+            "method": "hash"
+        }
+        self.plumbing_hooks = hooks.PlumbingHooks(self)
+        self.reset_mocks()
 
     def _get_a10_client(self, device_info):
         self.device_info = device_info
         self.last_client = mock.MagicMock()
-        self.plumbing_hooks = hooks.PlumbingHooks(self)
         return self.last_client
 
     def reset_mocks(self):
@@ -45,7 +60,8 @@ class UnitTestBase(unittest.TestCase):
         unit_dir = os.path.dirname(__file__)
         unit_config = os.path.join(unit_dir, "unit_config")
         os.environ['A10_CONFIG_DIR'] = unit_config
-        self.a = FakeA10OpenstackContrailLBV1(None)
+        self.a = FakeA10ContrailLoadBalancerDriver("testlb", mock.MagicMock(), mock.MagicMock(),
+                                                   mock.MagicMock())
 
     def print_mocks(self):
         print("OPENSTACK ", self.a.openstack_driver.mock_calls)

@@ -29,7 +29,7 @@ class A10Context(object):
         self.openstack_context = ncontext.get_admin_context()
         self.openstack_driver = handler.openstack_driver
         self.a10_driver = handler.a10_driver
-        self.hooks = self.a10_driver.hooks
+        self.hooks = self.a10_driver.plumbing_hooks
         self.openstack_lbaas_obj = openstack_lbaas_obj
         self.device_name = kwargs.get('device_name', None)
         LOG.debug("A10Context obj=%s", openstack_lbaas_obj)
