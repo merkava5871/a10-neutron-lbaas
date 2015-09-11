@@ -1,4 +1,4 @@
-# Copyright 2014, Doug Wiegley (dougwig), A10 Networks
+# Copyright 2015 A10 Networks
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,12 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
-import mock
-
-import a10_neutron_lbaas.contrail.v1.v1_context as a10
-
 import test_base
+# import pdb
+# import mock
+import a10_neutron_lbaas.contrail.v1.v1_context as a10
 
 
 class FakeException(Exception):
@@ -29,8 +27,6 @@ class TestA10Context(test_base.UnitTestBase):
 
     def setUp(self):
         super(TestA10Context, self).setUp()
-        self.get_admin_patch = mock.patch("neutron.context.get_admin_context")
-        self.get_admin_mock = self.get_admin_patch.start()
 
         self.handler = self.a.pool_handler
         self.m = {'id': 'fake-id-001', 'tenant_id': 'faketen1'}

@@ -12,11 +12,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+
+import mock
 import tests.unit.contrail.test_base as test_base
 
 
 class UnitTestBase(test_base.UnitTestBase):
-
     def __init__(self, *args):
         super(UnitTestBase, self).__init__(*args)
+        self.get_admin_patch = mock.patch("neutron.context.get_admin_context")
+        self.get_admin_mock = self.get_admin_patch.start()
+
         self.version = 'v1'

@@ -12,12 +12,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from a10_neutron_lbaas.contrail.v1 import driver as a10_vnc
 
 from mock import Mock,MagicMock
 import tests.unit.contrail.test_base as test_base
 import uuid
-
+from a10_neutron_lbaas.contrail.v1 import driver as a10_vnc
 
 class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
     def _build_fake_pool(self):
@@ -28,7 +27,7 @@ class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
         }
 
     def setUp(self):
-        super(TestA10ContrailLoadBalancerDriver, self).setUp(self)
+        super(TestA10ContrailLoadBalancerDriver, self).setUp()
         self.target = a10_vnc.A10ContrailLoadBalancerDriver("lb-name", Mock(), Mock(), Mock(), {})
         self.fake_pool = self._build_fake_pool()
 

@@ -36,6 +36,9 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
         self._args = args
         self.db = db
         self.config = a10_config.A10Config()
+        self._lb_template = None
+        self.plumbing_hooks = None
+        self.openstack_driver = None
 
     def _select_a10_device(self, tenant_id):
         return self.plumbing_hooks.select_device(tenant_id)
@@ -176,16 +179,16 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
 
     def delete_member(self, member):
         raise Exception("Not implemented")
-    
-    def create_pool_health_monitor(self, 
+
+    def create_pool_health_monitor(self,
                                    health_monitor,
                                    pool_id):
         raise Exception("Not implemented")
-    
+
     def delete_pool_health_monitor(self, health_monitor, pool_id):
         raise Exception("Not implemented")
-    
-    def update_health_monitor(self, 
+
+    def update_health_monitor(self,
                               old_health_monitor,
                               health_monitor,
                               pool_id):
@@ -205,4 +208,4 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
 
     @property
     def monitor_handler(self):
-        return handler_vm.HealthMonitorHandler(self)
+        return handler_hm.HealthMonitorHandler(self)

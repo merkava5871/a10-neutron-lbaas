@@ -14,8 +14,11 @@
 
 import os
 import unittest
+import sys
 
 import mock
+
+sys.modules["neutron"] = mock.Mock()
 
 import a10_neutron_lbaas.contrail.v1.driver as a10_vnc
 import a10_neutron_lbaas.contrail.plumbing_hooks as hooks
@@ -42,6 +45,9 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
         }
         self.plumbing_hooks = hooks.PlumbingHooks(self)
         self.reset_mocks()
+
+    def _verify_appliances(self):
+        return True
 
     def _get_a10_client(self, device_info):
         self.device_info = device_info
