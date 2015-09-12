@@ -13,10 +13,27 @@
 #    under the License.
 
 
-from mock import Mock,MagicMock
+from mock import Mock, MagicMock
+
+import sys
+
+sys.modules["a10_neutron_lbaas.contrail.v1.handler_base_v1"] = MagicMock()
+sys.modules["a10_neutron_lbaas.contrail.v1.handler_pool"] = MagicMock()
+# sys.modules["a10_neutron_lbaas.contrail.v1.driver.A10ContrailLoadBalancerDriver.pool_handler"] = MagicMock()
+sys.modules["a10_neutron_lbaas.contrail.a10_context"] = MagicMock()
+sys.modules["a10_neutron_lbaas.contrail.v1.v1_context"] = MagicMock()
+sys.modules["a10_neutron_lbaas.contrail.v1.driver.a10"] = MagicMock()
+sys.modules["neutron.context"] = MagicMock()
+
 import tests.unit.contrail.test_base as test_base
 import uuid
+
+# We should be able to do this with mock's patch method.
+# Why that doesn't work is unknown to me.
+
+
 from a10_neutron_lbaas.contrail.v1 import driver as a10_vnc
+
 
 class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
     def _build_fake_pool(self):

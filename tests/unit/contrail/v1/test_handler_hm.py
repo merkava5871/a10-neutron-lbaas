@@ -73,7 +73,6 @@ class TestHM(test_base.UnitTestBase):
             pool_id, health_monitor='abcdef')
 
     def test_create_https(self):
-        
         pool_id = "p01"
 
         self.handler.create(self.fake_hm('HTTPS'), pool_id)

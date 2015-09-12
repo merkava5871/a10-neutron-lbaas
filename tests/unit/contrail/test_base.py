@@ -16,15 +16,13 @@ import os
 import unittest
 import sys
 
-import mock
+from mock import Mock
 
-sys.modules["neutron"] = mock.Mock()
-
-import a10_neutron_lbaas.contrail.v1.driver as a10_vnc
+import a10_neutron_lbaas.contrail.v1.driver
 import a10_neutron_lbaas.contrail.plumbing_hooks as hooks
 
 
-class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
+class FakeA10ContrailLoadBalancerDriver(a10_neutron_lbaas.contrail.v1.driver.A10ContrailLoadBalancerDriver):
 
     def __init__(self, name, manager, api, db, args=None):
         super(FakeA10ContrailLoadBalancerDriver, self).__init__(name, manager, api, db, args)
@@ -45,6 +43,7 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
         }
         self.plumbing_hooks = hooks.PlumbingHooks(self)
         self.reset_mocks()
+        self._pool_handler = Mock()
 
     def _verify_appliances(self):
         return True
@@ -58,6 +57,10 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
         self.openstack_driver = mock.MagicMock()
         self.last_client = self._get_a10_client(self.device_info)
         return self.last_client
+
+    @property
+    def pool_handler(self):
+        return self._pool_handler
 
 
 class UnitTestBase(unittest.TestCase):
