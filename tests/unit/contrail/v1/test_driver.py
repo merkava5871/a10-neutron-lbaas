@@ -82,8 +82,6 @@ class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
         self.assertNotEqual(None, self.target.pool_handler)
 
     def test_create_pool_calls_pool_handler(self):
-        import pdb
-        pdb.set_trace()
         self.target.create_pool(self.fake_pool)
         self.assertEqual(1, self.target.pool_handler.create.call_count)
 
