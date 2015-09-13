@@ -49,6 +49,14 @@ class FakeVip(dict, object):
         self.id = id
 
 
+class FakeServiceInstance(dict, object):
+    def __init__(self):
+        pass
+
+    def set_service_template(self, template):
+        self._lb_template = template
+
+
 class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
     def setUp(self):
         v1context_patcher = mock.patch('a10_neutron_lbaas.contrail.v1.v1_context')
@@ -62,12 +70,16 @@ class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
 
         self.fake_vip = FakeVip()
         self.fake_pool = FakePool(vip_id=self.fake_vip.id)
+        self.fake_service_instance = FakeServiceInstance()
 
         self.v1_context = v1context_patcher.start()
         # self.phandler = phandler_patcher.start()
 
         self._api.loadbalancer_pool_read.return_value = self.fake_pool
         self._api.virtual_ip_read.return_value = self.fake_vip
+        self._api.service_instance_read.return_value = self.fake_service_instance
+        # this needs a method... a lambda might work.
+        self._api.service_instance_create.side_effect = (lambda x: x)
 
         self.target = a10_vnc.A10ContrailLoadBalancerDriver("lb-name", self._svc_mon,
                                                             self._api, self.db, {})

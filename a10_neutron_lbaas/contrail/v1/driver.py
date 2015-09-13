@@ -86,6 +86,7 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
 
         try:
             service_instance = self._api.service_instance_read(fq_name=fq_name)
+            # TODO(mmd) - This code doesn't look right.
             updated = self._service_instance_update_props(service_instance, props)
             if updated:
                 self._api.service_instance_update(service_instance)
