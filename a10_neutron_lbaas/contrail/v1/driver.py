@@ -11,21 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-# import pdb
-# pdb.set_trace()
-
-
 from svc_monitor.services.loadbalancer.drivers import abstract_driver
 from vnc_api.vnc_api import *
 
 from a10_neutron_lbaas.contrail import a10_config
-import pdb
-pdb.set_trace()
+from a10_neutron_lbaas.contrail import plumbing_hooks as hooks
 from a10_neutron_lbaas.contrail.v1 import handler_pool
 from a10_neutron_lbaas.contrail.v1 import handler_vip
 from a10_neutron_lbaas.contrail.v1 import handler_member
 from a10_neutron_lbaas.contrail.v1 import handler_hm
-from a10_neutron_lbaas.contrail.v1 import v1_context as a10
+# from a10_neutron_lbaas.contrail.v1 import v1_context as a10
 
 LOADBALANCER_SERVICE_TEMPLATE = {
     "default-domain",
@@ -41,9 +36,13 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
         self._args = args
         self.db = db
         self.config = a10_config.A10Config()
+        self.plumbing_hooks = hooks.PlumbingHooks(self)
         self._lb_template = None
-        self.plumbing_hooks = None
         self.openstack_driver = None
+        self._pool_handler = handler_pool.PoolHandler(self)
+        self._vip_handler = handler_vip.VipHandler(self)
+        self._hm_handler = handler_hm.HealthMonitorHandler(self)
+        self._member_handler = handler_member.MemberHandler(self)
 
     def _select_a10_device(self, tenant_id):
         return self.plumbing_hooks.select_device(tenant_id)
@@ -200,18 +199,16 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
 
     @property
     def pool_handler(self):
-        import pdb
-        pdb.set_trace()
-        return handler_pool.PoolHandler(self)
+        return self._pool_handler
 
     @property
     def vip_handler(self):
-        return handler_vip.VipHandler(self)
+        return self._vip_handler
 
     @property
     def member_handler(self):
-        return handler_member.MemberHandler(self)
+        return self._member_handler
 
     @property
     def monitor_handler(self):
-        return handler_hm.HealthMonitorHandler(self)
+        return self._hm_handler

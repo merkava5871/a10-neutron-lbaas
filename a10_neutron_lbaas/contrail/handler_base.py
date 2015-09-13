@@ -19,7 +19,7 @@ class HandlerBase(object):
 
     def __init__(self, a10_driver):
         self.a10_driver = a10_driver
-        self.hooks = a10_driver.plumbing_hooks
+        # self.hooks = a10_driver.plumbing_hooks
         self.openstack_driver = self.a10_driver.openstack_driver
 
     def _model_type(self):
