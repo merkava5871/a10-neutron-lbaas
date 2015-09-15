@@ -18,4 +18,10 @@ try:
     from a10_openstack_lb_v2 import A10OpenstackLBV2
 except ImportError:
     pass
+
+try:
+   from a10_contrail_v1 import A10ContrailDriverV1 
+except ImportError:
+    pass
+
 from version import VERSION
