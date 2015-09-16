@@ -29,7 +29,7 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
     def __init__(self, name, manager, api, db, args=None):
         self.config = a10_config.A10Config()
         # self.plumbing_hooks = hooks.PlumbingHooks(self)
-        self.openstack_driver = MagicMock()
+        # self.openstack_driver = MagicMock()
         self.device_info = {
             "name": "ax1",
             "host": "10.10.100.20",
@@ -45,6 +45,7 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
             "use_float": True,
             "method": "hash"
         }
+        self.name = name
 
         self.reset_mocks()
         self._pool_handler = MagicMock()
@@ -74,8 +75,12 @@ class UnitTestBase(unittest.TestCase):
         unit_dir = os.path.dirname(__file__)
         unit_config = os.path.join(unit_dir, "unit_config")
         os.environ['A10_CONFIG_DIR'] = unit_config
-        self.a = FakeA10ContrailLoadBalancerDriver("testlb", mock.MagicMock(), mock.MagicMock(),
-                                                   mock.MagicMock())
+        self.mock_manager = MagicMock()
+        self.mock_api = MagicMock()
+        self.mock_db = MagicMock()
+        self.mock_args = {}
+        self.a = FakeA10ContrailLoadBalancerDriver("lb-unit-test", self.mock_manager, self.mock_api,
+                                                   self.mock_db, self.mock_args)
 
     def print_mocks(self):
         print("OPENSTACK ", self.a.openstack_driver.mock_calls)

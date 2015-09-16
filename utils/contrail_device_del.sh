@@ -15,7 +15,7 @@ DEVICE_IP=10.48.5.219
 function log { 
 	cmd=$*
         echo $cmd
-	`$cmd`
+	eval $cmd
 }              
 
 log $VNC_CMD_BASE/service_appliance.py --api_server_ip $VNC_API_IP --api_server_port $VNC_API_PORT --oper del --admin_user $VNC_USER --admin_password $VNC_PASSWORD --admin_tenant_name $VNC_TENANT --name vthunder --service_appliance_set a10networks --device_ip $DEVICE_IP --user_credential $USER_CREDENTIAL 

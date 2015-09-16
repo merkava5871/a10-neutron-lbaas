@@ -12,10 +12,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
+
+
 import a10_neutron_lbaas.v1.v1_context as a10
 
 import test_base
 
+LOG = logging.getLogger(__name__)
 
 class FakeException(Exception):
     pass
@@ -25,7 +29,7 @@ class TestA10Context(test_base.UnitTestBase):
 
     def setUp(self):
         super(TestA10Context, self).setUp()
-        self.handler = self.a.pool
+        self.handler = self.a.pool_handler
         self.ctx = None
         self.m = {'id': 'fake-id-001', 'tenant_id': 'faketen1'}
 
@@ -70,6 +74,7 @@ class TestA10Context(test_base.UnitTestBase):
     def test_write_status(self):
         with a10.A10WriteStatusContext(self.handler, self.ctx, self.m) as c:
             c
+        # This should be a call to the backend Contrail handler (monitor? IIRC)
         self.a.openstack_driver._active.assert_called_with(
             None, 'pool', 'fake-id-001')
 

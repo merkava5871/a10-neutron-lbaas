@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
 from svc_monitor.services.loadbalancer.drivers import abstract_driver
 from vnc_api.vnc_api import *
 
@@ -22,6 +23,10 @@ from a10_neutron_lbaas.contrail.v1 import handler_member
 from a10_neutron_lbaas.contrail.v1 import handler_hm
 # from a10_neutron_lbaas.contrail.v1 import v1_context as a10
 
+# We set this later from contrail
+LOG = None
+
+
 LOADBALANCER_SERVICE_TEMPLATE = {
     "default-domain",
     "a10-loadbalancer-template"
@@ -30,15 +35,21 @@ LOADBALANCER_SERVICE_TEMPLATE = {
 
 class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstractDriver):
     def __init__(self, name, manager, api, db, args=None):
+        # our name - "a10networks"
         self._name = name
+        # Deals with lower level networking elements and load balancer statusesx
         self._api = api
+        # Passes _zookeeper_client to IndexAllocator, provides .logger with .exception,.error methods
         self._svc_mon = manager
+        # args passed from the cmd line
         self._args = args
-        self.db = db
+        # how we talk to contrail's DB
+        self._db = db
+        LOG = self._svc_mon.logger
+        self.LOG = LOG
         self.config = a10_config.A10Config()
         self.plumbing_hooks = hooks.PlumbingHooks(self)
         self._lb_template = None
-        self.openstack_driver = None
         self._pool_handler = handler_pool.PoolHandler(self)
         self._vip_handler = handler_vip.VipHandler(self)
         self._hm_handler = handler_hm.HealthMonitorHandler(self)
@@ -130,6 +141,12 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
 
     def create_vip(self, vip):
         # Check if device requires SNAT support so we can appropriately config the vip
+        # TODO(mdurrant): SNAT propery to check
+        try:
+            self.vip_handler.create(vip)
+        except Exception as ex:
+            raise ex
+                
         # Create VIP on device, check for error
         # If success, pass creation on to backend
         # If failure, set error status (INACTIVE)
@@ -158,6 +175,7 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
 
         try:
             self.pool_handler.create(pool)
+            self.db.pool_create(pool)
         except Exception as ex:
             # TODO(mmd) - You need a logger, dude.
             return

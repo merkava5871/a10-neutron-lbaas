@@ -103,4 +103,4 @@ class TestA10ContrailLoadBalancerDriver(test_base.UnitTestBase):
 
     def test_create_pool_calls_backend_handler(self):
         self.target.create_pool(self.fake_pool)
-        self.assertEqual(1, self.target.db.pool_driver_info_insert.call_count)
+        self.assertEqual(1, self.target._db.pool_driver_info_insert.call_count)

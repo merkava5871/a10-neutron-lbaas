@@ -22,13 +22,15 @@ LOG = logging.getLogger(__name__)
 
 
 class A10Context(object):
-
     def __init__(self, handler, openstack_lbaas_obj,
                  **kwargs):
         self.handler = handler
         self.openstack_context = ncontext.get_admin_context()
-        self.openstack_driver = handler.openstack_driver
         self.a10_driver = handler.a10_driver
+        self.contrail_db = handler._db
+        self.contrail_api = handler._api
+        self.contrail_svcmon = handler._svc_mon
+
         self.hooks = self.a10_driver.plumbing_hooks
         self.openstack_lbaas_obj = openstack_lbaas_obj
         self.device_name = kwargs.get('device_name', None)

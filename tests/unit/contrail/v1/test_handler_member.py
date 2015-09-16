@@ -44,26 +44,26 @@ class TestMembers(test_base.UnitTestBase):
 
     def test_get_ip(self):
         m = self.fake_member()
-        self.a.member.contrail.member_get_ip(None, m, False)
+        self.a.member_handler.contrail.member_get_ip(None, m, False)
         self.a.openstack_driver._member_get_ip.assert_called_with(None,
             m, False)
 
     def test_get_name(self):
         m = self.fake_member()
-        z = self.a.member._get_name(m, '1.1.1.1')
+        z = self.a.member_handler._get_name(m, '1.1.1.1')
         self.assertEqual(z, '_ten1_1_1_1_1_neutron')
 
     def test_count(self):
-        self.a.member.contrail.member_count(None, self.fake_member())
+        self.a.member_handler.contrail.member_count(None, self.fake_member())
 
     def fake_member(self, pool_id='pool1', admin_state_up=True):
         return _fake_member(pool_id, admin_state_up)
 
     def test_create(self, admin_state_up=True):
         m = self.fake_member(admin_state_up=admin_state_up)
-        ip = self.a.member.contrail.member_get_ip(m, True)
-        name = self.a.member._get_name(m, ip)
-        self.a.member.create(m)
+        ip = self.a.member_handler.contrail.member_get_ip(m, True)
+        name = self.a.member_handler._get_name(m, ip)
+        self.a.member_handler.create(m)
 
         self.a.last_client.slb.server.create.assert_called_with(
             name, ip,
@@ -72,7 +72,7 @@ class TestMembers(test_base.UnitTestBase):
             status = self.a.last_client.slb.UP
         else:
             status = self.a.last_client.slb.DOWN
-        pool_name = self.a.member._pool_name(m['pool_id'])
+        pool_name = self.a.member_handler._pool_name(m['pool_id'])
         self.a.last_client.slb.service_group.member.create.assert_called_with(
             pool_name, name, m['protocol_port'], status=status,
             axapi_args={'member': {}})
@@ -82,11 +82,11 @@ class TestMembers(test_base.UnitTestBase):
 
     def test_update_down(self):
         m = self.fake_member(admin_state_up=False)
-        ip = self.a.member.contrail.member_get_ip(m, True)
-        name = self.a.member._get_name(m, ip)
-        self.a.member.update(m, m)
+        ip = self.a.member_handler.contrail.member_get_ip(m, True)
+        name = self.a.member_handler._get_name(m, ip)
+        self.a.member_handler.update(m, m)
 
-        pool_name = self.a.member._pool_name(m['pool_id'])
+        pool_name = self.a.member_handler._pool_name(m['pool_id'])
         self.a.last_client.slb.service_group.member.update.assert_called_with(
             pool_name, name, m['protocol_port'],
             self.a.last_client.slb.DOWN,
@@ -94,10 +94,10 @@ class TestMembers(test_base.UnitTestBase):
 
     def test_delete(self):
         m = self.fake_member()
-        ip = self.a.member.contrail.member_get_ip(m, True)
+        ip = self.a.member_handler.contrail.member_get_ip(m, True)
 
         self.set_count_1()
-        self.a.member.delete(m)
+        self.a.member_handler.delete(m)
 
         self.a.last_client.slb.server.delete(ip)
 
@@ -105,7 +105,7 @@ class TestMembers(test_base.UnitTestBase):
         # import pdb
         # pdb.set_trace()
         m = self.fake_member()
-        handler = self.a.member
+        handler = self.a.member_handler
         handler.contrail.member_get_ip = (lambda x, y: "127.0.0.1")
         ip = handler.contrail.member_get_ip(m, True)
         name = handler._get_name(m, ip)

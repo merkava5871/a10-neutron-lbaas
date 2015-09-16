@@ -27,7 +27,8 @@ class TestA10Context(test_base.UnitTestBase):
 
     def setUp(self):
         super(TestA10Context, self).setUp()
-
+        # import pdb
+        # pdb.set_trace()
         self.handler = self.a.pool_handler
         self.m = {'id': 'fake-id-001', 'tenant_id': 'faketen1'}
 
