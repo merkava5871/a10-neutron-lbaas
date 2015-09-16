@@ -37,15 +37,15 @@ def _fake_member(pool_id='pool1', admin_state_up=True):
 class TestMembers(test_base.UnitTestBase):
 
     def set_count_1(self):
-        self.a.openstack_driver._member_count = return_one
+        self.a._svc_mon._member_count = return_one
 
     def set_count_2(self):
-        self.a.openstack_driver._member_count = return_two
+        self.a._svc_mon._member_count = return_two
 
     def test_get_ip(self):
         m = self.fake_member()
         self.a.member_handler.contrail.member_get_ip(None, m, False)
-        self.a.openstack_driver._member_get_ip.assert_called_with(None,
+        self.a._db._member_get_ip.assert_called_with(None,
             m, False)
 
     def test_get_name(self):

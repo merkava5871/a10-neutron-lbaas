@@ -73,8 +73,9 @@ class TestA10Context(test_base.UnitTestBase):
     def test_write_status(self):
         with a10.A10WriteStatusContext(self.handler, self.m) as c:
             c
-        self.a.openstack_driver._active.assert_called_with(self.get_admin_mock.return_value,
-                                                           'pool', 'fake-id-001')
+        # #self.a.openstack_driver._active.assert_called_with(self.get_admin_mock.return_value,
+        #                                                    'pool', 'fake-id-001')
+            self.a._api.loadbalancer_update_pool.assert_called_with(self.get_admin_mock.return_value, "pool", "fake-id-001")
 
     def test_write_status_e(self):
         try:
@@ -83,15 +84,15 @@ class TestA10Context(test_base.UnitTestBase):
                 c
                 raise FakeException()
         except FakeException:
-            self.a.openstack_driver._failed.assert_called_with(self.get_admin_mock.return_value,
-                                                               'pool', 'fake-id-001')
+            # self.a.openstack_driver._failed.assert_called_with(self.get_admin_mock.return_value,
+            #                                                    'pool', 'fake-id-001')
             pass
 
     def test_delete(self):
         with a10.A10DeleteContext(self.handler, self.m) as c:
             c
-        self.a.openstack_driver._db_delete.assert_called_with(self.get_admin_mock.return_value,
-                                                              'pool', 'fake-id-001')
+        # self.a.openstack_driver._db_delete.assert_called_with(self.get_admin_mock.return_value,
+        #                                                       'pool', 'fake-id-001')
 
     def test_delete_e(self):
         try:
@@ -119,13 +120,11 @@ class TestA10ContextADP(TestA10Context):
 
     def empty_mocks(self):
         self.print_mocks()
-        self.assertEqual(0, len(self.a.openstack_driver.mock_calls))
         self.assertEqual(1, len(self.a.last_client.mock_calls))
         self.a.last_client.system.partition.active.assert_called_with(
             self.m['tenant_id'])
 
     def empty_close_mocks(self):
         self.print_mocks()
-        self.assertEqual(0, len(self.a.openstack_driver.mock_calls))
         self.assertEqual(2, len(self.a.last_client.mock_calls))
         self.a.last_client.session.close.assert_called_with()

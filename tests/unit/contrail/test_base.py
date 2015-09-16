@@ -28,7 +28,7 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
 
     def __init__(self, name, manager, api, db, args=None):
         self.config = a10_config.A10Config()
-        # self.plumbing_hooks = hooks.PlumbingHooks(self)
+        self.plumbing_hooks = MagicMock()
         # self.openstack_driver = MagicMock()
         self.device_info = {
             "name": "ax1",
@@ -60,7 +60,6 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
         return self.last_client
 
     def reset_mocks(self):
-        self.openstack_driver = mock.MagicMock()
         self.last_client = self._get_a10_client(self.device_info)
         return self.last_client
 
@@ -83,16 +82,13 @@ class UnitTestBase(unittest.TestCase):
                                                    self.mock_db, self.mock_args)
 
     def print_mocks(self):
-        print("OPENSTACK ", self.a.openstack_driver.mock_calls)
         print("CLIENT ", self.a.last_client.mock_calls)
 
     def empty_mocks(self):
         self.print_mocks()
-        self.assertEqual(0, len(self.a.openstack_driver.mock_calls))
         self.assertEqual(0, len(self.a.last_client.mock_calls))
 
     def empty_close_mocks(self):
         self.print_mocks()
-        self.assertEqual(0, len(self.a.openstack_driver.mock_calls))
         self.assertEqual(1, len(self.a.last_client.mock_calls))
         self.a.last_client.session.close.assert_called_with()

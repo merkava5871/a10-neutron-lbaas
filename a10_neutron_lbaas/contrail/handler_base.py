@@ -19,7 +19,7 @@ class HandlerBase(object):
 
     def __init__(self, a10_driver):
         self.a10_driver = a10_driver
-        # self.hooks = a10_driver.plumbing_hooks
+        self.hooks = a10_driver.plumbing_hooks
         # Calls to openstack_driver should be calls to the driver's DB object
         self._db = a10_driver._db
         self._api = a10_driver._api
