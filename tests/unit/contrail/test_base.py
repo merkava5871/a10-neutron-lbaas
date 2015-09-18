@@ -19,9 +19,20 @@ import sys
 import mock
 from mock import MagicMock
 
+
 from a10_neutron_lbaas.contrail import a10_config as a10_config
 import a10_neutron_lbaas.contrail.v1.driver as a10_vnc
 import a10_neutron_lbaas.contrail.plumbing_hooks as hooks
+
+
+class FakeModel(object):
+    def __init__(self, **args):
+        self.id = args.get('id', "fake-id-01")
+        self.name = args.get('tenant_id', '')
+
+
+class FakePool(FakeModel):
+    pass
 
 
 class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
@@ -46,10 +57,9 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
             "method": "hash"
         }
         self.name = name
-
         self.reset_mocks()
-        self._pool_handler = MagicMock()
         super(FakeA10ContrailLoadBalancerDriver, self).__init__(name, manager, api, db, args)
+        self._contrail_ops = mock.Mock()
 
     def _verify_appliances(self):
         return True
@@ -67,6 +77,18 @@ class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
     def pool_handler(self):
         return self._pool_handler
 
+    @property
+    def member_handler(self):
+        return self._member_handler
+
+    @property
+    def monitor_handler(self):
+        return self._hm_handler
+
+    @property
+    def vip_handler(self):
+        return self._vip_handler
+
 
 class UnitTestBase(unittest.TestCase):
 
@@ -80,6 +102,7 @@ class UnitTestBase(unittest.TestCase):
         self.mock_args = {}
         self.a = FakeA10ContrailLoadBalancerDriver("lb-unit-test", self.mock_manager, self.mock_api,
                                                    self.mock_db, self.mock_args)
+       
 
     def print_mocks(self):
         print("CLIENT ", self.a.last_client.mock_calls)

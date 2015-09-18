@@ -13,30 +13,42 @@
 #    under the License.
 
 import mock
-from mock import Mock
+# from mock import Mock
 
-import sys
+# import sys
 
-with mock.patch.dict(sys.modules,
-                     {
-                         "a10_neutron_lbaas.contrail.a10_openstack_lb": Mock(),
-                         "a10_neutron_lbaas.contrail.v1.handler_base_v1": Mock(),
-                         "a10_neutron_lbaas.contrail.v1.handler_pool.PoolHandler": Mock(),
-                         "a10_neutron_lbaas.contrail.v1.handler_member": Mock(),
-                         "a10_neutron_lbaas.contrail.v1.handler_vip": Mock(),
-                         "a10_neutron_lbaas.contrail.v1.handler_hm": Mock(),
-                     }
-                     ):
-    pass
-    # from a10_neutron_lbaas.contrail.v1 import handler_base_v1
-    # from a10_neutron_lbaas.contrail.v1 import handler_pool
-    # from a10_neutron_lbaas.contrail.v1 import handler_member
-    # from a10_neutron_lbaas.contrail.v1 import handler_vip
-    # from a10_neutron_lbaas.contrail.v1 import handler_hm
+# with mock.patch.dict(sys.modules,
+#                      {
+#                          "a10_neutron_lbaas.contrail.a10_openstack_lb": Mock(),
+#                          "a10_neutron_lbaas .contrail.v1.contrail_ops.ContrailOpsV1": Mock(),
+#                          "a10_neutron_lbaas.contrail.v1.handler_base_v1": Mock(),
+#                          "a10_neutron_lbaas.contrail.v1.handler_pool.PoolHandler": Mock(),
+#                          "a10_neutron_lbaas.contrail.v1.handler_member": Mock(),
+#                          "a10_neutron_lbaas.contrail.v1.handler_vip": Mock(),
+#                          "a10_neutron_lbaas.contrail.v1.handler_hm": Mock(),
+#                      }
+#                      ):
+#     pass
+# from a10_neutron_lbaas.contrail.v1 import handler_base_v1
+# from a10_neutron_lbaas.contrail.v1 import handler_pool
+# from a10_neutron_lbaas.contrail.v1 import handler_member
+# from a10_neutron_lbaas.contrail.v1 import handler_vip
+# from a10_neutron_lbaas.contrail.v1 import handler_hm
 
 
 import tests.unit.contrail.test_base as test_base
 
+
+class FakeModel(object):
+    def __init__(self, **args):
+        self.id = args.get('id', "fake-id-01")
+        self.name = args.get('tenant_id', '')
+
+
+class FakePool(FakeModel):
+    def __init__(self, **args):
+        super(FakePool, self).__init__(args=args)
+        self.id = "p01"
 
 
 class UnitTestBase(test_base.UnitTestBase):

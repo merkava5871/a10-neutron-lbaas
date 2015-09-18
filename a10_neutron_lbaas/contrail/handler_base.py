@@ -16,15 +16,14 @@ import json
 
 
 class HandlerBase(object):
-
     def __init__(self, a10_driver):
         self.a10_driver = a10_driver
-        self.hooks = a10_driver.plumbing_hooks
+        self.hooks = self.a10_driver.plumbing_hooks
         # Calls to openstack_driver should be calls to the driver's DB object
-        self._db = a10_driver._db
-        self._api = a10_driver._api
-        self._svc_mon = a10_driver._svc_mon
-        # self.openstack_driver = self.a10_driver.openstack_driver
+        self._db = self.a10_driver._db
+        self._api = self.a10_driver._api
+        self._svc_mon = self.a10_driver._svc_mon
+        self._contrail = self.a10_driver._contrail_ops
 
     def _model_type(self):
         return self.__class__.__name__.lower().replace('handler', '')
@@ -41,7 +40,7 @@ class HandlerBase(object):
     def _pool_name(self, context, pool_id=None, pool=None):
         if not pool:
             # TODO(hthompson) - Make sure htis is the right call.
-            pool = self.contrail.pool_get(context, pool_id)
+            pool = self._contrail.pool_get(pool_id)
         if not pool_id:
             pool_id = pool.id
         return self.meta(pool, 'name', pool_id)

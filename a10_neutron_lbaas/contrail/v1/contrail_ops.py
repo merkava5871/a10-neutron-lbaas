@@ -10,60 +10,60 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from svc_monitor.config_db import *
+from svc_monitor.config_db import HealthMonitorSM
+from svc_monitor.config_db import LoadbalancerPoolSM
+from svc_monitor.config_db import LoadbalancerMemberSM
+
 
 class ContrailOpsV1(object):
 
-    def __init__(self, handler):
+    def __init__(self, driver):
         # We don't need to talk to Openstack directly anymore
         # We talk to VNC
-        self._db = handler._db
-        self._api = handler._api
-        self._svc_mon = handler._svc_mon
-        # This is the DB plugin that talks to Openstack - we need the contrail DB.
-        # self.plugin = self.openstack_driver.plugin
-        pass
+        self._db = driver._db
+        self._api = driver._api
+        self._svc_mon = driver._svc_mon
+        self.logger = self._svc_mon.logger
 
-    def hm_binding_count(self, context, hm_id):
-        return 0
-        # raise Exception("Not implemented!")
-        # return self.openstack_driver._hm_binding_count(context, hm_id)
+    def hm_binding_count(self, hm_id):
+        result = 0
+        try:
+            lb_hm = self.hm_get(hm_id)
+            result = len(lb_hm.loadbalancer_pools or ())
+        except Exception as ex:
+            self.logger.log_error("db entry missing for lb healthmonitor %s" %
+                                  (hm_id))
+        return result
 
-    def hm_get(self, context, hm_id):
-        return 0
-        # raise Exception("Not implemented!")
-        # return self.openstack_driver._pool_get_hm(context, hm_id)
+    def hm_get(self, hm_id):
+        lb_hm = None
+        hm = object()
+        try:
+            lb_hm = HealthMonitorSM.locate(hm_id, hm)
+        except Exception as ex:
+            self.logger.log_error("db entry missing for lb healthmonitor %s" %
+                                  (hm_id))
+        return lb_hm
 
-    def member_get_ip(self, context, member, use_float=False):
-        return 0
-        # raise Exception("Not implemented!")
-        # return self.openstack_driver._member_get_ip(context, member, use_float)
-
-    def member_count(self, context, member):
-        return 0
+    def member_get_ip(self, member, use_float=False):
         raise Exception("Not implemented!")
-        # return self.openstack_driver._member_count(context, member)
 
-    def member_get(self, context, member_id):
-        return 0
+    def member_count(self, member):
         raise Exception("Not implemented!")
-        # return self.openstack_driver._member_get(context, member_id)
 
-    def pool_get(self, context, pool_id):
-        return 0
-        raise Exception("Not implemented!")
-        # return self.plugin.get_pool(context, pool_id)
+    def member_get(self, member_id):
+        return LoadbalancerMemberSM.get(member_id)
 
-    def pool_get_tenant_id(self, context, pool_id):
-        return 0
-        raise Exception("Not implemented!")
-        # return self.openstack_driver._pool_get_tenant_id(context, pool_id)
+    def pool_get(self, pool_id):
+        return LoadbalancerPoolSM.get(pool_id)
 
-    def vip_get(self, context, vip_id):
-        return 0
-        raise Exception("Not implemented!")
-        # return self.plugin.get_vip(context, vip_id)
+    def pool_get_tenant_id(self, pool_id):
+        pool = self.pool_get(pool_id)
+        return pool["tenant_id"]
 
-    def vip_get_id(self, context, pool_id):
-        return 0
+    def vip_get(self, vip_id):
         raise Exception("Not implemented!")
-        # return self.openstack_driver._pool_get_vip_id(context, pool_id)
+
+    def vip_get_id(self, pool_id):
+        raise Exception("Not implemented!")

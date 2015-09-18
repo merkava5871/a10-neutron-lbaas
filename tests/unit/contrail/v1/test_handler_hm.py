@@ -13,6 +13,7 @@
 #    under the License.
 
 import test_base
+import mock
 
 
 class TestHM(test_base.UnitTestBase):
@@ -20,6 +21,11 @@ class TestHM(test_base.UnitTestBase):
     def setUp(self):
         super(TestHM, self).setUp()
         self.handler = self.a.monitor_handler
+        self.a._contrail_ops = mock.MagicMock()
+        self.handler._contrail = self.a._contrail_ops
+        self.handler._contrail.pool_get.return_value = test_base.FakePool()
+
+        # self.handler.a10_driver.contrail = mock.Mock()
 
     def assert_hm(self, mon_type, method, url, expect_code):
         self.print_mocks()
@@ -56,19 +62,20 @@ class TestHM(test_base.UnitTestBase):
         hm = self.fake_hm('TCP')
         hm['pools'] = [{'pool_id': 'p02'}, {'pool_id': 'p01'}]
         self.handler.create(hm, 'p01')
+
         self.assert_hm(self.a.last_client.slb.hm.TCP, None, None, None)
         pool_name = self.handler._pool_name('p02')
         self.a.last_client.slb.service_group.update.assert_called_with(
             pool_name, health_monitor='abcdef')
 
     def test_create_http(self):
-        hm = self.fake_hm('HTTP')
-        handler = self.a.monitor_handler
-        pool_id = "p01"
-        handler.create(hm, pool_id)
-        self.assert_hm(self.a.last_client.slb.hm.HTTP, 'GET', '/', '200')
 
-        handler._pool_name(pool_id)
+        hm = self.fake_hm('HTTP')
+        pool_id = "p01"
+        self.handler.create(hm, pool_id)
+        self.assert_hm(self.a.last_client.slb.hm.HTTP, 'GET', '/', '200')
+        
+        self.handler._pool_name(pool_id)
         self.a.last_client.slb.service_group.update.assert_called_with(
             pool_id, health_monitor='abcdef')
 

@@ -15,8 +15,10 @@
 from svc_monitor.services.loadbalancer.drivers import abstract_driver
 from vnc_api.vnc_api import *
 
+
 from a10_neutron_lbaas.contrail import a10_config
 from a10_neutron_lbaas.contrail import plumbing_hooks as hooks
+import a10_neutron_lbaas.contrail.v1.contrail_ops as contrail_ops
 from a10_neutron_lbaas.contrail.v1 import handler_pool
 from a10_neutron_lbaas.contrail.v1 import handler_vip
 from a10_neutron_lbaas.contrail.v1 import handler_member
@@ -50,6 +52,7 @@ class A10ContrailLoadBalancerDriver(abstract_driver.ContrailLoadBalancerAbstract
         self.config = a10_config.A10Config()
         self.plumbing_hooks = hooks.PlumbingHooks(self)
         self._lb_template = None
+        self._contrail_ops = contrail_ops.ContrailOpsV1(self)
         self._pool_handler = handler_pool.PoolHandler(self)
         self._vip_handler = handler_vip.VipHandler(self)
         self._hm_handler = handler_hm.HealthMonitorHandler(self)
