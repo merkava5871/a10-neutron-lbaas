@@ -29,8 +29,8 @@ class TestA10Context(test_base.UnitTestBase):
         super(TestA10Context, self).setUp()
         # import pdb
         # pdb.set_trace()
-        self.handler = self.a.pool_handler
-        self.m = {'id': 'fake-id-001', 'tenant_id': 'faketen1'}
+        self.handler = self.a._pool_handler
+        self.m = test_base.FakePool()
 
     def test_context(self):
         with a10.A10Context(self.handler, self.m) as c:
@@ -75,7 +75,7 @@ class TestA10Context(test_base.UnitTestBase):
             c
         # #self.a.openstack_driver._active.assert_called_with(self.get_admin_mock.return_value,
         #                                                    'pool', 'fake-id-001')
-            self.a._api.loadbalancer_update_pool.assert_called_with(self.get_admin_mock.return_value, "pool", "fake-id-001")
+            self.a._api.loadbalancer_update_pool.assert_called_with("pool", "fake-id-001")
 
     def test_write_status_e(self):
         try:

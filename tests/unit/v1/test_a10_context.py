@@ -21,6 +21,7 @@ import test_base
 
 LOG = logging.getLogger(__name__)
 
+
 class FakeException(Exception):
     pass
 
@@ -29,7 +30,7 @@ class TestA10Context(test_base.UnitTestBase):
 
     def setUp(self):
         super(TestA10Context, self).setUp()
-        self.handler = self.a.pool_handler
+        self.handler = self.a.pool
         self.ctx = None
         self.m = {'id': 'fake-id-001', 'tenant_id': 'faketen1'}
 
