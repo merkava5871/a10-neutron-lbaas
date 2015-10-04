@@ -25,16 +25,6 @@ import a10_neutron_lbaas.contrail.v1.driver as a10_vnc
 import a10_neutron_lbaas.contrail.plumbing_hooks as hooks
 
 
-class FakeModel(object):
-    def __init__(self, **args):
-        self.id = args.get('id', "fake-id-01")
-        self.name = args.get('tenant_id', '')
-
-
-class FakePool(FakeModel):
-    pass
-
-
 class FakeA10ContrailLoadBalancerDriver(a10_vnc.A10ContrailLoadBalancerDriver):
 
     def __init__(self, name, manager, api, db, args=None):

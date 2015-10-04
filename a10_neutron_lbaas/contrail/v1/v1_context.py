@@ -1,4 +1,4 @@
-# Copyright 2014, Doug Wiegley (dougwig), A10 Networks
+# Copyright 2014, Doug Wiegl ey (dougwig), A10 Networks
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -27,6 +27,7 @@ class A10WriteStatusContext(a10_context.A10WriteContext):
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
+	   
             # replace with call to contrail back end
             # self.openstack_driver._active(
             #     self.openstack_context,
@@ -34,11 +35,16 @@ class A10WriteStatusContext(a10_context.A10WriteContext):
             #     self.openstack_lbaas_obj['id'])
             m = "Successfully created %s of type %".format(self.handler._model_type(),
                                                            self.openstack_lbaas_obj['id'])
-            self.a10_driver.LOG.info(m)
+           
+	   
+	    self.a10_driver.LOG.info(m)
         else:
-            m = "Failed to create` %s of type %".format(self.handler._model_type(),
-                                                        self.openstack_lbaas_obj['id'])
-            self.a10_driver.LOG.warn(m)
+	   # if 'id' in self.openstack_lbaas_obj:
+           m = "Failed to create` %s of type %".format(self.handler._model_type(),
+                                                            self.openstack_lbaas_obj['id'])
+           self.a10_driver.LOG.warn(m)
+	    #else:
+		#pass
             # Replace with call to contrail back end
             # self.openstack_driver._failed(
             #     self.openstack_context,
@@ -57,9 +63,17 @@ class A10DeleteContext(a10_context.A10DeleteContextBase):
             #     self.openstack_context,
             #     self.handler._model_type(),
             #     self.openstack_lbaas_obj['id'])
-            m = "Successfully deleted %s of type %".format(self.handler._model_type(),
-                                                           self.openstack_lbaas_obj['id'])
-            self.a10_driver.LOG.info(m)
+	    print("START HERE")
+	    print(self.openstack_lbaas_obj)
+            import pdb
+	    pdb.set_trace()
+	    #if 'id' in self.openstack_lbaas_obj:
+	    m = "Successfully deleted %s of type %".format(self.handler._model_type(),
+                                                               self.openstack_lbaas_obj['id'])
+  	    self.a10_driver.LOG.info(m)
+	    
+	    #else:
+	        #pass
 
         super(A10DeleteContext, self).__exit__(exc_type, exc_value, traceback)
 

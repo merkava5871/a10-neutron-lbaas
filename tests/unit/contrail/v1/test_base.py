@@ -39,17 +39,19 @@ import mock
 import tests.unit.contrail.test_base as test_base
 
 
-class FakeModel(object):
-    def __init__(self, **args):
-        self.id = args.get('id', "fake-id-01")
-        self.name = args.get('tenant_id', '')
-
+class FakeModel(dict, object):
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id', "fake-id-01")
+        self.name = kwargs.get('name', self.id)
+        self.tenant_id = kwargs.get('tenant_id', '')
+    
+    def __getattr__(self,attr):
+    	return self[attr]    
 
 class FakePool(FakeModel):
-    def __init__(self, **args):
-        super(FakePool, self).__init__(args=args)
+    def __init__(self, **kwargs):
+        super(FakePool, self).__init__(**kwargs)
         self.id = "p01"
-
 
 class UnitTestBase(test_base.UnitTestBase):
     def __init__(self, *args):

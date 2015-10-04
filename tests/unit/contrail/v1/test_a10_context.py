@@ -27,8 +27,8 @@ class TestA10Context(test_base.UnitTestBase):
 
     def setUp(self):
         super(TestA10Context, self).setUp()
-        # import pdb
-        # pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
         self.handler = self.a._pool_handler
         self.m = test_base.FakePool()
 
@@ -89,10 +89,13 @@ class TestA10Context(test_base.UnitTestBase):
             pass
 
     def test_delete(self):
-        with a10.A10DeleteContext(self.handler, self.m) as c:
+        #import pdb
+	    #pdb.set_trace()
+        test_pool = {"id": "fake-id-001", "name": "fake-id-001", "tenant_id": "tenant-pays-rent-on-time"}
+        with a10.A10DeleteContext(self.handler, test_pool) as c:
             c
-        # self.a.openstack_driver._db_delete.assert_called_with(self.get_admin_mock.return_value,
-        #                                                       'pool', 'fake-id-001')
+        self.a.openstack_driver._db_delete.assert_called_with(self.get_admin_mock.return_value,
+                                                              'pool', 'fake-id-001')
 
     def test_delete_e(self):
         try:
