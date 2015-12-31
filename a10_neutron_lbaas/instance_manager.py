@@ -35,7 +35,7 @@ GLANCE_VERSION = 1
 KEYSTONE_VERSION = "2.0"
 NOVA_VERSION = "2.1"
 NEUTRON_VERSION = "2.0"
-OS_INTERFACE_URL = "publicURL"
+OS_INTERFACE_URL = "public"
 
 _default_server = {
     "id": None,
@@ -65,9 +65,10 @@ MISSING_ERR_FORMAT = "{0} with name or id {1} could not be found"
 class InstanceManager(object):
     def __init__(self, context=None, request=None, nova_api=None,
                  glance_api=None, neutron_api=None, keystone_api=None):
+        import pdb; pdb.set_trace()
         self.context = context
         self.user = request.user
-        self.tenant_id = request.user.project_id
+        self.tenant_id = request.user.token.project["id"]
         self.endpoints = self._get_services_from_token(self.user.token)
         (self.auth_url, self.auth_token) = self._get_auth_from_token(self.user.token)
         self._validate_auth()
@@ -85,35 +86,41 @@ class InstanceManager(object):
         self._glance_api = glance_api or glance_client.Client(GLANCE_VERSION, session=session)
 
     def _validate_auth(self):
-        if self.auth_url is None or self.auth_token is None:
-            raise AttributeError("Auth URL and Token must be provided for authentication.")
+        pass
+        # if self.auth_url is None or self.auth_token is None:
+        #     raise AttributeError("Auth URL and Token must be provided for authentication.")
 
     def _get_services_from_token(self, token):
+        # This changes between keystone versions.
+        import pdb; pdb.set_trace()
         res = {}
         for x in token.serviceCatalog:
             # This is always returned as an array.
-            # I'm not positive we can deterministically retrieve
-            # the correct endpoint if there are multiple.
-            endpoints = x.get("endpoints", [{}])[0]
-            res[x["type"]] = endpoints.get(OS_INTERFACE_URL)
+            endpoints = x.get("endpoints", [{}])
+            endpoint_filter = lambda x: x.get("interface") == OS_INTERFACE_URL
+            endpoint = filter(endpoint_filter, endpoints)
+            if len(endpoint) > 0:
+                res[x["type"]] = endpoint[0].get("url")
         return res
 
     def _get_auth_from_token(self, token):
         auth_url = None
         auth_token = token.unscoped_token
 
-        services = filter(lambda x: x.get("type") == "identity", token.serviceCatalog)
+        services = filter(lambda x: x.get("type") == "identity" and OS_INTERFACE_URL in map(lambda y: y["interface"], x.get("endpoints")), token.serviceCatalog)
 
-        if services and len(services) > 0:
-            identity_service = services[0]
-            endpoints = identity_service.get("endpoints", [])
-            if len(endpoints) > 0:
-                auth_url = endpoints[0].get(OS_INTERFACE_URL, None)
+        if self.endpoints:
+            auth_url = self.endpoints.get("identity", None)
+        # if services and len(services) > 0:
+        #     identity_service = services[0]
+        #     endpoints = identity_service.get("endpoints", [])
+        #     if len(endpoints) > 0:
+        #         auth_url = endpoints[0].get(OS_INTERFACE_URL, None)
         else:
             LOG.exception("Identity Service discovery failed.")
 
         self.token = auth_plugin.Token(token=auth_token,
-                                       project_name=self.user.username,
+                                       project_name=self.user.token.project["name"],
                                        auth_url=auth_url)
 
         return (auth_url, auth_token)
