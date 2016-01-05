@@ -65,7 +65,6 @@ MISSING_ERR_FORMAT = "{0} with name or id {1} could not be found"
 class InstanceManager(object):
     def __init__(self, context=None, request=None, nova_api=None,
                  glance_api=None, neutron_api=None, keystone_api=None):
-        import pdb; pdb.set_trace()
         self.context = context
         self.user = request.user
         self.tenant_id = request.user.token.project["id"]
@@ -92,7 +91,6 @@ class InstanceManager(object):
 
     def _get_services_from_token(self, token):
         # This changes between keystone versions.
-        import pdb; pdb.set_trace()
         res = {}
         for x in token.serviceCatalog:
             # This is always returned as an array.
