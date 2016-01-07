@@ -92,6 +92,8 @@ class InstanceManager(object):
     def _get_services_from_token(self, token):
         # This changes between keystone versions.
         res = {}
+        if not token.serviceCatalog or len(token.serviceCatalog) < 1:
+            raise AttributeError("FATAL: Service catalog not populated.")
         for x in token.serviceCatalog:
             # This is always returned as an array.
             endpoints = x.get("endpoints", [{}])
@@ -105,15 +107,8 @@ class InstanceManager(object):
         auth_url = None
         auth_token = token.unscoped_token
 
-        services = filter(lambda x: x.get("type") == "identity" and OS_INTERFACE_URL in map(lambda y: y["interface"], x.get("endpoints")), token.serviceCatalog)
-
         if self.endpoints:
             auth_url = self.endpoints.get("identity", None)
-        # if services and len(services) > 0:
-        #     identity_service = services[0]
-        #     endpoints = identity_service.get("endpoints", [])
-        #     if len(endpoints) > 0:
-        #         auth_url = endpoints[0].get(OS_INTERFACE_URL, None)
         else:
             LOG.exception("Identity Service discovery failed.")
 
