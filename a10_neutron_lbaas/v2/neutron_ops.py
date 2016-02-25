@@ -45,3 +45,6 @@ class NeutronOpsV2(object):
 
     def pool_get(self, context, pool_id):
         return self.plugin.db.get_pool(context, pool_id)
+
+    def vip_get(self, context, vip_id):
+        return self.plugin.db.get_vip(context, vip_id)
