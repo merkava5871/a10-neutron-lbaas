@@ -63,7 +63,6 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
                 self._pool_name(context, pool['pool_id']),
                 health_monitor=self._meta_name(hm))
 
-
     def create(self, context, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
@@ -77,7 +76,7 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
         h = hm.copy()
         h['pool_id'] = pool_id
         with a10.A10WriteHMStatusContext(self, context, h) as c:
-            self._update(c, context, c.client.slb.hm.update, context, hm)
+            self._update(c, context, old_hm, hm, pool_id)
 
     def _dissociate(self, c, context, hm, pool_id):
         """Remove a pool association"""

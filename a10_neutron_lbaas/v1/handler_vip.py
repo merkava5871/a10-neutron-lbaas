@@ -107,7 +107,6 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
         with a10.A10WriteStatusContext(self, context, vip) as c:
             self._create(c, context, vip)
 
-
     def _update(self, c, context, old_vip, vip):
         status = c.client.slb.UP
         if not vip['admin_state_up']:

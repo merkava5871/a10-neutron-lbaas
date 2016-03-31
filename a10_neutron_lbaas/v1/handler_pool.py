@@ -42,7 +42,7 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
 
     def create(self, context, pool):
         with a10.A10WriteStatusContext(self, context, pool) as c:
-            self._create(c, context ,pool)
+            self._create(c, context, pool)
 
     def _update(self, c, context, old_pool, pool):
             self._set(c.client.slb.service_group.update,
@@ -72,7 +72,6 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
             except (acos_errors.NotFound, acos_errors.NoSuchServiceGroup):
                 pass
 
-
     def delete(self, context, pool):
         with a10.A10DeleteContext(self, context, pool) as c:
             self._delete(c, context, pool)
@@ -97,7 +96,6 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
                 "active_connections": 0,
                 "total_connections": 0
             }
-
 
     def stats(self, context, pool_id):
         tenant_id = self.neutron.pool_get_tenant_id(context, pool_id)
