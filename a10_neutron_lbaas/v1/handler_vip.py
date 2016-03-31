@@ -35,114 +35,123 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
             vport_meta = self.meta(vip, 'port', {})
         return vport_meta
 
-    def create(self, context, vip):
-        with a10.A10WriteStatusContext(self, context, vip) as c:
-            status = c.client.slb.UP
-            if not vip['admin_state_up']:
-                status = c.client.slb.DOWN
+    def _create(self, c, context, vip):
+        status = c.client.slb.UP
+        if not vip['admin_state_up']:
+            status = c.client.slb.DOWN
 
-            pool_name = self._pool_name(context, vip['pool_id'])
+        pool_name = self._pool_name(context, vip['pool_id'])
 
-            p = PersistHandler(c, context, vip, self._meta_name(vip))
-            p.create()
+        p = PersistHandler(c, context, vip, self._meta_name(vip))
+        p.create()
 
-            templates = self.meta(vip, "template", {})
+        templates = self.meta(vip, "template", {})
 
-            if 'client_ssl' in templates:
-                args = {'client_ssl_template': templates['client_ssl']}
-                try:
-                    c.client.slb.template.client_ssl.create(
-                        '', '', '',
-                        axapi_args=args)
-                except acos_errors.Exists:
-                    pass
-
-            if 'server_ssl' in templates:
-                args = {'server_ssl_template': templates['server_ssl']}
-                try:
-                    c.client.slb.template.server_ssl.create(
-                        '', '', '',
-                        axapi_args=args)
-                except acos_errors.Exists:
-                    pass
-
-            vport_list = None
+        if 'client_ssl' in templates:
+            args = {'client_ssl_template': templates['client_ssl']}
             try:
-                vip_meta = self.meta(vip, 'virtual_server', {})
-                vport_list = vip_meta.pop('vport_list', None)
-                c.client.slb.virtual_server.create(
-                    self._meta_name(vip),
-                    vip['address'],
-                    status,
-                    axapi_body=vip_meta,
-                    neutron_subnet_id=vip['subnet_id'])
+                c.client.slb.template.client_ssl.create(
+                    '', '', '',
+                    axapi_args=args)
             except acos_errors.Exists:
                 pass
 
-            LOG.debug("VPORT_LIST = %s", vport_list)
-            if vport_list is None:
-                vport_list = [self.vport_meta(vip)]
-            for vport, i in zip(vport_list, range(len(vport_list))):
-                try:
-                    vport_name = str(i) if i else ''
-                    c.client.slb.virtual_server.vport.create(
-                        self._meta_name(vip),
-                        self._meta_name(vip) + '_VPORT' + vport_name,
-                        protocol=a10_os.vip_protocols(c, vip['protocol']),
-                        port=vip['protocol_port'],
-                        service_group_name=pool_name,
-                        s_pers_name=p.s_persistence(),
-                        c_pers_name=p.c_persistence(),
-                        status=status,
-                        axapi_body=vport)
-                except acos_errors.Exists:
-                    pass
+        if 'server_ssl' in templates:
+            args = {'server_ssl_template': templates['server_ssl']}
+            try:
+                c.client.slb.template.server_ssl.create(
+                    '', '', '',
+                    axapi_args=args)
+            except acos_errors.Exists:
+                pass
 
-            slb = models.default(
-                models.A10SLBV1,
-                vip_id=vip['id'],
-                a10_appliance=c.appliance)
-            c.db_operations.add(slb)
-            self.hooks.after_vip_create(c, context, vip)
+        vport_list = None
+        try:
+            vip_meta = self.meta(vip, 'virtual_server', {})
+            vport_list = vip_meta.pop('vport_list', None)
+            c.client.slb.virtual_server.create(
+                self._meta_name(vip),
+                vip['address'],
+                status,
+                axapi_body=vip_meta,
+                neutron_subnet_id=vip['subnet_id'])
+        except acos_errors.Exists:
+            pass
+
+        LOG.debug("VPORT_LIST = %s", vport_list)
+        if vport_list is None:
+            vport_list = [self.vport_meta(vip)]
+        for vport, i in zip(vport_list, range(len(vport_list))):
+            try:
+                vport_name = str(i) if i else ''
+                c.client.slb.virtual_server.vport.create(
+                    self._meta_name(vip),
+                    self._meta_name(vip) + '_VPORT' + vport_name,
+                    protocol=a10_os.vip_protocols(c, vip['protocol']),
+                    port=vip['protocol_port'],
+                    service_group_name=pool_name,
+                    s_pers_name=p.s_persistence(),
+                    c_pers_name=p.c_persistence(),
+                    status=status,
+                    axapi_body=vport)
+            except acos_errors.Exists:
+                pass
+
+        slb = models.default(
+            models.A10SLBV1,
+            vip_id=vip['id'],
+            a10_appliance=c.appliance)
+        c.db_operations.add(slb)
+        self.hooks.after_vip_create(c, context, vip)
+
+    def create(self, context, vip):
+        with a10.A10WriteStatusContext(self, context, vip) as c:
+            self._create(c, context, vip)
+
+
+    def _update(self, c, context, old_vip, vip):
+        status = c.client.slb.UP
+        if not vip['admin_state_up']:
+            status = c.client.slb.DOWN
+
+        pool_name = self._pool_name(context, vip['pool_id'])
+
+        p = PersistHandler(c, context, vip, self._meta_name(vip))
+        p.create()
+
+        templates = self.meta(vip, "template", {})
+
+        if 'client_ssl' in templates:
+            args = {'client_ssl_template': templates['client_ssl']}
+            c.client.slb.template.client_ssl.update(
+                '', '', '',
+                axapi_args=args)
+
+        if 'server_ssl' in templates:
+            args = {'server_ssl_template': templates['server_ssl']}
+            c.client.slb.template.server_ssl.update(
+                '', '', '',
+                axapi_args=args)
+
+        vport_meta = self.vport_meta(vip)
+        c.client.slb.virtual_server.vport.update(
+            self._meta_name(vip),
+            self._meta_name(vip) + '_VPORT',
+            protocol=a10_os.vip_protocols(c, vip['protocol']),
+            port=vip['protocol_port'],
+            service_group_name=pool_name,
+            s_pers_name=p.s_persistence(),
+            c_pers_name=p.c_persistence(),
+            status=status,
+            axapi_body=vport_meta)
+
+        self.hooks.after_vip_update(c, context, vip)
+
+
 
     def update(self, context, old_vip, vip):
         with a10.A10WriteStatusContext(self, context, vip) as c:
-            status = c.client.slb.UP
-            if not vip['admin_state_up']:
-                status = c.client.slb.DOWN
-
-            pool_name = self._pool_name(context, vip['pool_id'])
-
-            p = PersistHandler(c, context, vip, self._meta_name(vip))
-            p.create()
-
-            templates = self.meta(vip, "template", {})
-
-            if 'client_ssl' in templates:
-                args = {'client_ssl_template': templates['client_ssl']}
-                c.client.slb.template.client_ssl.update(
-                    '', '', '',
-                    axapi_args=args)
-
-            if 'server_ssl' in templates:
-                args = {'server_ssl_template': templates['server_ssl']}
-                c.client.slb.template.server_ssl.update(
-                    '', '', '',
-                    axapi_args=args)
-
-            vport_meta = self.vport_meta(vip)
-            c.client.slb.virtual_server.vport.update(
-                self._meta_name(vip),
-                self._meta_name(vip) + '_VPORT',
-                protocol=a10_os.vip_protocols(c, vip['protocol']),
-                port=vip['protocol_port'],
-                service_group_name=pool_name,
-                s_pers_name=p.s_persistence(),
-                c_pers_name=p.c_persistence(),
-                status=status,
-                axapi_body=vport_meta)
-
-            self.hooks.after_vip_update(c, context, vip)
+            self._update(c, context, old_vip, vip)
 
     def _delete(self, c, context, vip):
         try:

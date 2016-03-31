@@ -60,8 +60,7 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
             self._create(c, context, member)
             self.hooks.after_member_create(c, context, member)
 
-    def update(self, context, old_member, member):
-        with a10.A10WriteStatusContext(self, context, member) as c:
+    def _update(self, c, context, old_member, member):
             server_ip = self.neutron.member_get_ip(context, member,
                                                    c.device_cfg['use_float'])
             server_name = self._meta_name(member, server_ip)
@@ -83,6 +82,10 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
                 self._create(c, context, member)
 
             self.hooks.after_member_update(c, context, member)
+
+    def update(self, context, old_member, member):
+        with a10.A10WriteStatusContext(self, context, member) as c:
+            self._update(c, context, old_member, member)
 
     def _delete(self, c, context, member):
         server_ip = self.neutron.member_get_ip(context, member, c.device_cfg['use_float'])

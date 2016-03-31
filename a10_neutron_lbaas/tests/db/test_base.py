@@ -13,6 +13,7 @@
 #    under the License.from neutron.db import model_base
 
 import a10_neutron_lbaas.tests.test_case as test_case
+import a10_neutron_lbaas.tests.unit.unit_config as unit_config
 
 import session
 
@@ -20,6 +21,7 @@ import session
 class UnitTestBase(test_case.TestCase):
 
     def setUp(self):
+        unit_config.setUp()
         (open_session, close_session) = session.fake_session()
         self.open_session = open_session
         self.close_session = close_session

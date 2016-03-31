@@ -45,32 +45,39 @@ class HealthMonitorHandler(handler_base_v1.HandlerBaseV1):
                    method=method, url=url, expect_code=expect_code,
                    axapi_args=args)
 
+    def _create(self, c, context, hm, pool_id):
+        try:
+            self._set(c, c.client.slb.hm.create, context, hm)
+        except acos_errors.Exists:
+            pass
+
+        if pool_id is not None:
+            c.client.slb.service_group.update(
+                self._pool_name(context, pool_id),
+                health_monitor=self._meta_name(hm))
+
+        for pool in hm['pools']:
+            if pool['pool_id'] == pool_id:
+                continue
+            c.client.slb.service_group.update(
+                self._pool_name(context, pool['pool_id']),
+                health_monitor=self._meta_name(hm))
+
+
     def create(self, context, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
         with a10.A10WriteHMStatusContext(self, context, h) as c:
-            try:
-                self._set(c, c.client.slb.hm.create, context, hm)
-            except acos_errors.Exists:
-                pass
+            self._create(c, context, h, pool_id)
 
-            if pool_id is not None:
-                c.client.slb.service_group.update(
-                    self._pool_name(context, pool_id),
-                    health_monitor=self._meta_name(hm))
-
-            for pool in hm['pools']:
-                if pool['pool_id'] == pool_id:
-                    continue
-                c.client.slb.service_group.update(
-                    self._pool_name(context, pool['pool_id']),
-                    health_monitor=self._meta_name(hm))
+    def _update(self, c, context, old_hm, hm, pool_id):
+        self._set(c, c.client.slb.hm.update, context, hm)
 
     def update(self, context, old_hm, hm, pool_id):
         h = hm.copy()
         h['pool_id'] = pool_id
         with a10.A10WriteHMStatusContext(self, context, h) as c:
-            self._set(c, c.client.slb.hm.update, context, hm)
+            self._update(c, context, c.client.slb.hm.update, context, hm)
 
     def _dissociate(self, c, context, hm, pool_id):
         """Remove a pool association"""

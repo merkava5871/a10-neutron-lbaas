@@ -33,24 +33,26 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
             lb_method=a10_os.service_group_lb_method(c, pool['lb_method']),
             axapi_args=args)
 
+    def _create(self, c, context, pool):
+        try:
+            self._set(c.client.slb.service_group.create,
+                      c, context, pool)
+        except acos_errors.Exists:
+            pass
+
     def create(self, context, pool):
         with a10.A10WriteStatusContext(self, context, pool) as c:
-            try:
+            self._create(c, context ,pool)
 
-                self._set(c.client.slb.service_group.create,
-                          c, context, pool)
-            except acos_errors.Exists:
-                pass
-
-    def update(self, context, old_pool, pool):
-        # id_func = lambda x: x.get("monitor_id")
-
-        with a10.A10WriteStatusContext(self, context, pool) as c:
+    def _update(self, c, context, old_pool, pool):
             self._set(c.client.slb.service_group.update,
                       c, context, pool)
 
-    def delete(self, context, pool):
-        with a10.A10DeleteContext(self, context, pool) as c:
+    def update(self, context, old_pool, pool):
+        with a10.A10WriteStatusContext(self, context, pool) as c:
+            self._update(c, context, old_pool, pool)
+
+    def _delete(self, c, context, pool):
             pool_id = pool.get("id")
 
             for member in pool['members']:
@@ -70,26 +72,35 @@ class PoolHandler(handler_base_v1.HandlerBaseV1):
             except (acos_errors.NotFound, acos_errors.NoSuchServiceGroup):
                 pass
 
+
+    def delete(self, context, pool):
+        with a10.A10DeleteContext(self, context, pool) as c:
+            self._delete(c, context, pool)
+
+    def _stats(self, c, context, pool):
+        try:
+            vip_id = self.neutron.vip_get_id(context, pool['id'])
+            vip = self.neutron.vip_get(context, vip_id)
+            name = self.meta(vip, 'vip_name', vip['id'])
+            r = c.client.slb.virtual_server.stats(name)
+            return {
+                "bytes_in": r["virtual_server_stat"]["req_bytes"],
+                "bytes_out": r["virtual_server_stat"]["resp_bytes"],
+                "active_connections":
+                    r["virtual_server_stat"]["cur_conns"],
+                "total_connections": r["virtual_server_stat"]["tot_conns"]
+            }
+        except Exception:
+            return {
+                "bytes_in": 0,
+                "bytes_out": 0,
+                "active_connections": 0,
+                "total_connections": 0
+            }
+
+
     def stats(self, context, pool_id):
         tenant_id = self.neutron.pool_get_tenant_id(context, pool_id)
         pool = {'id': pool_id, 'tenant_id': tenant_id}
         with a10.A10Context(self, context, pool) as c:
-            try:
-                vip_id = self.neutron.vip_get_id(context, pool['id'])
-                vip = self.neutron.vip_get(context, vip_id)
-                name = self.meta(vip, 'vip_name', vip['id'])
-                r = c.client.slb.virtual_server.stats(name)
-                return {
-                    "bytes_in": r["virtual_server_stat"]["req_bytes"],
-                    "bytes_out": r["virtual_server_stat"]["resp_bytes"],
-                    "active_connections":
-                        r["virtual_server_stat"]["cur_conns"],
-                    "total_connections": r["virtual_server_stat"]["tot_conns"]
-                }
-            except Exception:
-                return {
-                    "bytes_in": 0,
-                    "bytes_out": 0,
-                    "active_connections": 0,
-                    "total_connections": 0
-                }
+            return self._stats(c, context, pool)
