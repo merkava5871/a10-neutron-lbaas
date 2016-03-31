@@ -58,7 +58,6 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
     def create(self, context, member):
         with a10.A10WriteStatusContext(self, context, member) as c:
             self._create(c, context, member)
-            self.hooks.after_member_create(c, context, member)
 
     def _update(self, c, context, old_member, member):
             server_ip = self.neutron.member_get_ip(context, member,
@@ -81,8 +80,6 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
                 # Adding db relation after the fact
                 self._create(c, context, member)
 
-            self.hooks.after_member_update(c, context, member)
-
     def update(self, context, old_member, member):
         with a10.A10WriteStatusContext(self, context, member) as c:
             self._update(c, context, old_member, member)
@@ -101,8 +98,6 @@ class MemberHandler(handler_base_v1.HandlerBaseV1):
                 c.client.slb.server.delete(server_name)
         except acos_errors.NotFound:
             pass
-
-        self.hooks.after_member_delete(c, context, member)
 
     def delete(self, context, member):
         with a10.A10DeleteContext(self, context, member) as c:

@@ -102,7 +102,6 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
             vip_id=vip['id'],
             a10_appliance=c.appliance)
         c.db_operations.add(slb)
-        self.hooks.after_vip_create(c, context, vip)
 
     def create(self, context, vip):
         with a10.A10WriteStatusContext(self, context, vip) as c:
@@ -145,10 +144,6 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
             status=status,
             axapi_body=vport_meta)
 
-        self.hooks.after_vip_update(c, context, vip)
-
-
-
     def update(self, context, old_vip, vip):
         with a10.A10WriteStatusContext(self, context, vip) as c:
             self._update(c, context, old_vip, vip)
@@ -165,7 +160,6 @@ class VipHandler(handler_base_v1.HandlerBaseV1):
     def delete(self, context, vip):
         with a10.A10DeleteContext(self, context, vip) as c:
             self._delete(c, context, vip)
-            self.hooks.after_vip_delete(c, context, vip)
 
 
 class PersistHandler(object):
