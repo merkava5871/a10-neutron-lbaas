@@ -51,36 +51,39 @@ class PoolHandler(handler_base_v2.HandlerBaseV2):
 
     def create(self, context, pool):
         with a10.A10WriteStatusContext(self, context, pool) as c:
-            try:
-                self._set(c.client.slb.service_group.create,
-                          c, context, pool)
-            except acos_errors.Exists:
-                pass
+            self._create(c, context, pool)
+
+    def _update(self, c, context, old_pool, pool):
+        self._set(c.client.slb.service_group.update,
+                  c, context, pool)
 
     def update(self, context, old_pool, pool):
         with a10.A10WriteStatusContext(self, context, pool) as c:
-            self._set(c.client.slb.service_group.update,
-                      c, context, pool)
+            self._update(c, context, old_pool, pool)
+
+    def _delete(self, c, context, pool):
+        for member in pool.members:
+            self.a10_driver.member._delete(c, context, member)
+
+        LOG.debug("handler_pool.delete(): Checking pool health monitor...")
+        if pool.healthmonitor:
+            # The pool.healthmonitor we get doesn't have a pool
+            # Make a new one with the hm as the root
+            hm = copy.copy(pool.healthmonitor)
+            hm.pool = copy.copy(pool)
+            hm.pool.healthmonitor = None
+            LOG.debug("handler_pool.delete(): HM: %s" % hm)
+            self.a10_driver.hm._delete(c, context, hm)
+
+        try:
+            c.client.slb.service_group.delete(self._meta_name(pool))
+        except (acos_errors.NotFound, acos_errors.NoSuchServiceGroup):
+            pass
+
+        handler_persist.PersistHandler(
+            c, context, pool, self._meta_name(pool)).delete()
 
     def delete(self, context, pool):
         with a10.A10DeleteContext(self, context, pool) as c:
-            for member in pool.members:
-                self.a10_driver.member._delete(c, context, member)
+            self._delete(c, context, pool)
 
-            LOG.debug("handler_pool.delete(): Checking pool health monitor...")
-            if pool.healthmonitor:
-                # The pool.healthmonitor we get doesn't have a pool
-                # Make a new one with the hm as the root
-                hm = copy.copy(pool.healthmonitor)
-                hm.pool = copy.copy(pool)
-                hm.pool.healthmonitor = None
-                LOG.debug("handler_pool.delete(): HM: %s" % hm)
-                self.a10_driver.hm._delete(c, context, hm)
-
-            try:
-                c.client.slb.service_group.delete(self._meta_name(pool))
-            except (acos_errors.NotFound, acos_errors.NoSuchServiceGroup):
-                pass
-
-            handler_persist.PersistHandler(
-                c, context, pool, self._meta_name(pool)).delete()

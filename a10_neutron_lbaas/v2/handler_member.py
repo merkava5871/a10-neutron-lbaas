@@ -55,35 +55,34 @@ class MemberHandler(handler_base_v2.HandlerBaseV2):
         except acos_errors.Exists:
             pass
 
-        self.hooks.after_member_create(c, context, member)
-
     def create(self, context, member):
         with a10.A10WriteStatusContext(self, context, member) as c:
             self._create(c, context, member)
 
+    def _update(self, c, context, old_member, member):
+        server_ip = self.neutron.member_get_ip(context, member,
+                                               c.device_cfg['use_float'])
+        server_name = self._meta_name(member, server_ip)
+
+        status = c.client.slb.UP
+        if not member.admin_state_up:
+            status = c.client.slb.DOWN
+
+        try:
+            member_args = {'member': self.meta(member, 'member', {})}
+            c.client.slb.service_group.member.update(
+                self._pool_name(context, pool=member.pool),
+                server_name,
+                member.protocol_port,
+                status,
+                axapi_args=member_args)
+        except acos_errors.NotFound:
+            # Adding db relation after the fact
+            self._create(c, context, member)
+
     def update(self, context, old_member, member):
         with a10.A10WriteStatusContext(self, context, member) as c:
-            server_ip = self.neutron.member_get_ip(context, member,
-                                                   c.device_cfg['use_float'])
-            server_name = self._meta_name(member, server_ip)
-
-            status = c.client.slb.UP
-            if not member.admin_state_up:
-                status = c.client.slb.DOWN
-
-            try:
-                member_args = {'member': self.meta(member, 'member', {})}
-                c.client.slb.service_group.member.update(
-                    self._pool_name(context, pool=member.pool),
-                    server_name,
-                    member.protocol_port,
-                    status,
-                    axapi_args=member_args)
-            except acos_errors.NotFound:
-                # Adding db relation after the fact
-                self._create(c, context, member)
-
-            self.hooks.after_member_update(c, context, member)
+            self._update(c, context, old_member, member)
 
     def _delete(self, c, context, member):
         server_ip = self.neutron.member_get_ip(
@@ -100,8 +99,6 @@ class MemberHandler(handler_base_v2.HandlerBaseV2):
                 c.client.slb.server.delete(server_name)
         except acos_errors.NotFound:
             pass
-
-        self.hooks.after_member_delete(c, context, member)
 
     def delete(self, context, member):
         with a10.A10DeleteContext(self, context, member) as c:
