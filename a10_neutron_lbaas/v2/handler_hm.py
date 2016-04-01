@@ -95,7 +95,7 @@ class HealthMonitorHandler(handler_base_v2.HandlerBaseV2):
 
     def update(self, context, old_hm, hm):
         with a10.A10WriteStatusContext(self, context, hm) as c:
-            self._update(context, c, old_hm, hm)
+            self._update(c, context, old_hm, hm)
 
     def _delete(self, c, context, hm):
         LOG.debug("HealthMonitorHandler.delete(): hm=%s, context=%s" % (hm, context))

@@ -70,7 +70,7 @@ class TestHM(test_base.UnitTestBase):
         m.delay = 20
         self.a.hm.update(None, m_old, m)
         self.a.openstack_driver.health_monitor.successful_completion.assert_called_with(
-            None, m)
+            mock.ANY, m)
         self.a.last_client.slb.hm.update.assert_called_with(
             'fake-hm-id-001', self.a.last_client.slb.hm.TCP, 20, 7, 8,
             method=None, url=None, expect_code=None, axapi_args={})
