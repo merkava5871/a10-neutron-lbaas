@@ -22,9 +22,7 @@ import test_base
 class FakeException(Exception):
     pass
 
-
 class TestA10Context(test_base.UnitTestBase):
-
     def setUp(self, **kwargs):
         super(TestA10Context, self).setUp(**kwargs)
         self.handler = self.a.pool

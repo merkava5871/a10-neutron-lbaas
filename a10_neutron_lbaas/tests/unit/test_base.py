@@ -30,10 +30,9 @@ def _build_openstack_context():
 class FakeA10OpenstackLB(object):
 
     def __init__(self, openstack_driver, **kw):
-        super(FakeA10OpenstackLB, self).__init__(
-            mock.MagicMock(),
-            **kw)
         self.openstack_context = _build_openstack_context()
+        self.hooks = mock.MagicMock()
+	self.openstack_driver = openstack_driver
 
     def mock_a10_client(self, device_info):
         self.device_info = device_info
@@ -68,9 +67,9 @@ class UnitTestBase(test_case.TestCase):
         unit_config.setUp()
 
         if not hasattr(self, 'version') or self.version == 'v2':
-            self.a = FakeA10OpenstackLBV2(None, **openstack_lb_args)
+            self.a = FakeA10OpenstackLBV2(mock.MagicMock(), **openstack_lb_args)
         else:
-            self.a = FakeA10OpenstackLBV1(None, **openstack_lb_args)
+            self.a = FakeA10OpenstackLBV1(mock.MagicMock(), **openstack_lb_args)
 
     def print_mocks(self):
         print("OPENSTACK ", self.a.openstack_driver.mock_calls)
