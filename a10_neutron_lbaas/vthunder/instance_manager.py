@@ -101,7 +101,6 @@ class InstanceManager(object):
         self._glance_api = glance_api or glance_client.Client(
             GLANCE_VERSION, session=session)
 
-
     def _get_keystone(self, ks_version, auth_url, user, password, tenant_name):
         if int(ks_version) == 2:
             auth = v2.Password(
