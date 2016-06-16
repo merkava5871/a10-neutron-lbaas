@@ -25,6 +25,7 @@ import v1.handler_pool
 import v1.handler_vip
 
 import v2.handler_hm
+import v2.handler_l7
 import v2.handler_lb
 import v2.handler_listener
 import v2.handler_member
@@ -128,6 +129,20 @@ class A10OpenstackLBV2(A10OpenstackLBBase):
         return v2.handler_hm.HealthMonitorHandler(
             self,
             self.openstack_driver.health_monitor,
+            neutron=self.neutron)
+
+    @property
+    def l7policy(self):
+        return v2.handler_l7.L7PolicyHandler(
+            self,
+            self.openstack_driver.l7policy,
+            neutron=self.neutron)
+
+    @property
+    def l7rule(self):
+        return v2.handler_l7.L7RuleHandler(
+            self,
+            self.openstack_driver.l7rule,
             neutron=self.neutron)
 
 

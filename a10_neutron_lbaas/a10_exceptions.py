@@ -75,3 +75,11 @@ class NoDevicesAvailableError(Exception):
 
 class NotImplemented(Exception):
     pass
+
+
+class ValidationError(Exception):
+    pass
+
+
+class L7PolicyActionNotImplementedError(ValidationError):
+    pass
