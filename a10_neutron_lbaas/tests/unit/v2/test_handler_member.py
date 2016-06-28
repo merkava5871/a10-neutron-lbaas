@@ -13,6 +13,7 @@
 #    under the License.
 
 import mock
+import time
 import test_base
 
 
@@ -114,3 +115,12 @@ class TestMembers(test_base.UnitTestBase):
 
         self.a.last_client.slb.service_group.member.delete.assert_called_with(
             m.pool_id, name, m.protocol_port)
+
+    def test_updating_operating_status(self):
+        test_lb = test_base.FakeLoadBalancer()
+        self._test_create()
+        time.sleep(5)
+        self.print_mocks()
+
+        s = str(self.a.last_client.mock_calls)
+        asdf

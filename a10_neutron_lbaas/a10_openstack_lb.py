@@ -30,6 +30,9 @@ import v2.handler_listener
 import v2.handler_member
 import v2.handler_pool
 
+import worker.status_check as status_check
+import worker.main as worker
+
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
 
@@ -73,6 +76,15 @@ class A10OpenstackLBBase(object):
 
         if self.config.get('verify_appliances'):
             self._verify_appliances()
+
+        if self.config.get('use_worker_thread'):
+            self.worker = worker.WorkerThread(a10_driver=self,
+                                              sleep_timer=self.config.get("worker_sleep_time"),
+                                              status_update=self.status_check)
+            self.worker.daemon = True
+            self.worker.start()
+        else:
+            self.worker = None
 
     def _select_a10_device(self, tenant_id, a10_context=None, lbaas_obj=None, **kwargs):
         if hasattr(self.hooks, 'select_device_with_lbaas_obj'):
@@ -146,6 +158,10 @@ class A10OpenstackLBV2(A10OpenstackLBBase):
             self.openstack_driver.health_monitor,
             neutron=self.neutron)
 
+    @property
+    def status_check(self):
+        return status_check.status_update_v2
+
 
 class A10OpenstackLBV1(A10OpenstackLBBase):
 
@@ -164,3 +180,7 @@ class A10OpenstackLBV1(A10OpenstackLBBase):
     @property
     def hm(self):
         return v1.handler_hm.HealthMonitorHandler(self)
+
+    @property
+    def status_check(self):
+        return status_check.status_update_v1
