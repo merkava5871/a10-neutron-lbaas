@@ -123,4 +123,3 @@ class TestMembers(test_base.UnitTestBase):
         self.print_mocks()
 
         s = str(self.a.last_client.mock_calls)
-        asdf
