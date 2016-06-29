@@ -16,6 +16,9 @@ import mock
 import time
 import test_base
 
+import logging
+
+LOG = logging.getLogger(__name__)
 
 def return_one(*args):
     return 1
@@ -119,7 +122,7 @@ class TestMembers(test_base.UnitTestBase):
     def test_updating_operating_status(self):
         test_lb = test_base.FakeLoadBalancer()
         self._test_create()
-        time.sleep(5)
+        time.sleep(2)
         self.print_mocks()
-
+        LOG.info("TESTING: {0}".format(self.a.openstack_driver.member.mock_calls))
         s = str(self.a.last_client.mock_calls)

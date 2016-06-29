@@ -34,5 +34,4 @@ class WorkerThread(threading.Thread):
         LOG.info("A10 worker thread, starting")
 
         while True:
-            time.sleep(5)
             self.status_update(self.a10_driver)

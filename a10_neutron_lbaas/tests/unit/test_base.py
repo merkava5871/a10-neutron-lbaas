@@ -54,7 +54,12 @@ class FakeA10OpenstackLB(object):
 
 
 class FakeA10OpenstackLBV1(FakeA10OpenstackLB, a10_os.A10OpenstackLBV1):
-    pass
+    def __init__(self, openstack_driver, **kw):
+        super(FakeA10OpenstackLBV1, self).__init__(
+            openstack_driver,
+            neutron_hooks_module=mock.MagicMock(),
+            *kw)
+        self.openstack_driver.plugin.db = mock.MagicMock()
 
 
 class FakeA10OpenstackLBV2(FakeA10OpenstackLB, a10_os.A10OpenstackLBV2):
@@ -65,6 +70,7 @@ class FakeA10OpenstackLBV2(FakeA10OpenstackLB, a10_os.A10OpenstackLBV2):
             neutron_hooks_module=mock.MagicMock(),
             **kw)
         self.certmgr = mock.Mock()
+        self.openstack_driver.plugin.db = mock.MagicMock()
 
 
 class UnitTestBase(test_case.TestCase):
@@ -82,10 +88,12 @@ class UnitTestBase(test_case.TestCase):
         if not hasattr(self, 'version') or self.version == 'v2':
             self.v_ops = v2_ops.NeutronOpsV2
             self.v_ops.get_models = mock.MagicMock()
+            self.v_ops.get_neutron_admin_context = mock.MagicMock()
             self.a = FakeA10OpenstackLBV2(mock.MagicMock(), **openstack_lb_args)
         else:
             self.v_ops = v1_ops.NeutronOpsV1
             self.v_ops.get_models = mock.MagicMock()
+            self.v_ops.get_neutron_admin_context = mock.MagicMock()
             self.a = FakeA10OpenstackLBV1(mock.MagicMock(), **openstack_lb_args)
 
     def print_mocks(self):
