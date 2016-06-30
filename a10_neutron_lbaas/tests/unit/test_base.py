@@ -59,7 +59,7 @@ class FakeA10OpenstackLBV1(FakeA10OpenstackLB, a10_os.A10OpenstackLBV1):
             openstack_driver,
             neutron_hooks_module=mock.MagicMock(),
             *kw)
-        self.openstack_driver.plugin.db = mock.MagicMock()
+        #self.openstack_driver.plugin.db.get_pools() = [FakePools()]
 
 
 class FakeA10OpenstackLBV2(FakeA10OpenstackLB, a10_os.A10OpenstackLBV2):
@@ -70,7 +70,7 @@ class FakeA10OpenstackLBV2(FakeA10OpenstackLB, a10_os.A10OpenstackLBV2):
             neutron_hooks_module=mock.MagicMock(),
             **kw)
         self.certmgr = mock.Mock()
-        self.openstack_driver.plugin.db = mock.MagicMock()
+        self.openstack_driver.plugin.db.get_loadbalancers() = [FakeLoadBalancer()]
 
 
 class UnitTestBase(test_case.TestCase):

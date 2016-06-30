@@ -40,6 +40,11 @@ class FakePool(FakeModel):
         self.id = id
         self.name = name
 
+class FakeMemeber(Fakemodel):
+    def __init__(self, id="mem01", name="mem01"):
+        self.id = id
+        self.name = name
+
 
 class UnitTestBase(test_base.UnitTestBase):
 

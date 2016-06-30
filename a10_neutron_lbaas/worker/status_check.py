@@ -28,17 +28,15 @@ LOG = logging.getLogger(__name__)
 
 
 def status_update_v1(a10_driver):
-    lb_db = a10_driver.openstack_driver.plugin.db
+    lb_db = a10_driver.openstack_driver.plugin
     v1_nops = v1_ops.NeutronOpsV1(a10_driver)
     context = v1_nops.get_neutron_admin_context()
     models = v1_nops.get_models()
-    for pool in lb_db.get_pools(context):
-        for member in pool.members:
-            member_h = v1_handler_member.MemberHandler(a10_driver,
-                                                       a10_driver.openstack_driver.member,
-                                                       neutron=a10_driver.neutron)
-            member_h._update_operating_status(context, member, lb_db, models.Member, pool)
-
+    for member in lb_db.get_members(context):
+        member_h = v1_handler_member.MemberHandler(a10_driver,
+                                                   a10_driver.openstack_driver.member,
+                                                   neutron=a10_driver.neutron)
+        member_h._update_operating_status(context, member, lb_db, models.Member, pool)
 
 def status_update_v2(a10_driver):
     lb_db = a10_driver.openstack_driver.plugin.db
