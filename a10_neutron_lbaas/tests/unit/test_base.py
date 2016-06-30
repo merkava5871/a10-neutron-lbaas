@@ -59,7 +59,7 @@ class FakeA10OpenstackLBV1(FakeA10OpenstackLB, a10_os.A10OpenstackLBV1):
             openstack_driver,
             neutron_hooks_module=mock.MagicMock(),
             *kw)
-        #self.openstack_driver.plugin.db.get_pools() = [FakePools()]
+        self.openstack_driver.plugin.get_members() = [FakeMember()]
 
 
 class FakeA10OpenstackLBV2(FakeA10OpenstackLB, a10_os.A10OpenstackLBV2):
