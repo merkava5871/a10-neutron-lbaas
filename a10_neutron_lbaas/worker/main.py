@@ -35,4 +35,4 @@ class WorkerThread(threading.Thread):
 
         while True:
             self.status_update(self.a10_driver)
-            #time.sleep(5)
+            time.sleep(1)

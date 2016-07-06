@@ -72,7 +72,7 @@ class A10Context(object):
         if hasattr(self.openstack_lbaas_obj, 'tenant_id'):
             self.tenant_id = self.openstack_lbaas_obj.root_loadbalancer.tenant_id
         else:
-            self.tenant_id = self.openstack_lbaas_obj['tenant_id']
+            self.tenant_id = self.openstack_lbaas_obj.get('tenant_id')
 
     def select_appliance_partition(self):
 
