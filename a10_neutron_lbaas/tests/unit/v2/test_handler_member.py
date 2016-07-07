@@ -14,6 +14,7 @@
 
 import logging
 import mock
+import time
 
 import fake_objs
 import test_base
@@ -119,3 +120,7 @@ class TestMembers(test_base.UnitTestBase):
 
         self.a.last_client.slb.service_group.member.delete.assert_called_with(
             m.pool_id, name, m.protocol_port)
+
+    def test_updating_oper_stats(self):
+        time.sleep(6)
+        self.a.last_client.slb.service_group.member.get_oper.mock_calls[0].assert_called_with('fake-pool-id-001', mock.ANY, 80)
