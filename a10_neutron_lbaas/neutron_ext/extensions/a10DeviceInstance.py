@@ -78,12 +78,14 @@ class A10DeviceInstance(extensions.ExtensionDescriptor):
 
 
 class A10DeviceInstanceNotFoundError(exceptions.NotFound):
+
     def __init__(self, a10_device_instance_id):
         self.msg = _("A10 Device Instance {} could not be found.")
         super(A10DeviceInstanceNotFoundError, self).__init__()
 
 
 class A10DeviceInstanceInUseError(exceptions.InUse):
+
     def __init__(self, a10_device_instance_id):
         self.message = _("A10 Device Instance is in use and cannot be deleted.")
         self.msg = self.message
