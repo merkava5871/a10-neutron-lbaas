@@ -42,5 +42,7 @@ def _find(*args):
 
 convert_to_int = _find(lambda: old_attributes.convert_to_int,
                        lambda: lib_converters.convert_to_int)
+convert_to_list = _find(lambda: old_attributes.convert_to_list,
+                        lambda: lib_converters.convert_to_list)
 ATTR_NOT_SPECIFIED = _find(lambda: old_constants.ATTR_NOT_SPECIFIED,
                            lambda: lib_constants.ATTR_NOT_SPECIFIED)
