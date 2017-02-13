@@ -49,7 +49,8 @@ _mappings = [("id", None, None, "id"),
              (None, "use_float", None, "use_float"),
              (None, "default_virtual_server_vrid", None, "default_virtual_server_vrid"),
              (None, "ipinip", None, "ipinip"),
-             (None, "write_memory", None, "write_memory")
+             (None, "write_memory", None, "write_memory"),
+             ("networks", "vthunder_networks", "networks", None)
              ]
 
 

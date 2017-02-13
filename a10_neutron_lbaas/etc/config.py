@@ -173,8 +173,7 @@ devices = {
 #     'nova_flavor': 'vthunder.small',  # 1 core, 4096MB ram, 12GB disk
 #     'glance_image': None,
 
-#     'vthunder_management_network': 'private-mgmt',
-#     'vthunder_data_networks': [ 'vip-net', 'member-net' ],
+#     'vthunder_networks': [ 'vip-net', 'member-net' ],
 
 # # License the launched instances
 #

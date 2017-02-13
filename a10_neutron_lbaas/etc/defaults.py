@@ -67,8 +67,7 @@ VTHUNDER_REQUIRED_FIELDS = [
     'nova_flavor',
     'glance_image',
 
-    'vthunder_management_network',
-    'vthunder_data_networks',
+    'vthunder_networks',
 ]
 
 VTHUNDER_OPTIONAL_DEFAULTS = DEVICE_OPTIONAL_DEFAULTS

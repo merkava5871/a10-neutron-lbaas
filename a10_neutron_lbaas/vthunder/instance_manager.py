@@ -320,14 +320,15 @@ class InstanceManager(object):
         if flavor is None:
             raise a10_ex.FeatureNotConfiguredError("Launching instance requires configured flavor")
 
-        mgmt_network = vthunder_config.get("vthunder_management_network")
+        networks = []
 
-        networks = [mgmt_network] if mgmt_network else []
-        networks += vthunder_config.get('vthunder_data_networks')
+        config_networks = vthunder_config.get("vthunder_networks")
 
-        if networks is None or len(networks) < 1:
+        if config_networks is None or len(config_networks < 1):
             raise a10_ex.FeatureNotConfiguredError(
                 "Launching instance requires configured networks")
+
+        networks += config_networks
 
         return {
             'name': name,

@@ -158,8 +158,8 @@ vthunder = {
     'vthunder_tenant_username': 'admin',
     'vthunder_tenant_password': 'password',
 
-    'vthunder_management_network': 'private',
-    'vthunder_data_networks': ['vipnet', 'membernet'],
+    # management network is 0th member of array
+    'vthunder_networks': ['private', 'vipnet', 'membernet'],
 
     'sflow_collector': {"host": "10.10.10.10", "port": 6343},
 

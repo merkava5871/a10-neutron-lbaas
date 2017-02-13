@@ -247,8 +247,7 @@ class TestInstanceManager(test_base.UnitTestBase):
         defaults["networks"] = ["mgmt-net"]
         defaults["glance_image"] = "image001"
         defaults["nova_flavor"] = "flavor001"
-        defaults["vthunder_management_network"] = "mgmt-net"
-        defaults["vthunder_data_networks"] = ["mgmt-net"]
+        defaults["vthunder_networks"] = ["mgmt-net"]
 
         self.fake_created.addresses = dict((network, [
             {
