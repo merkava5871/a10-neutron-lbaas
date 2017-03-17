@@ -329,12 +329,19 @@ class InstanceManager(object):
             raise a10_ex.FeatureNotConfiguredError(
                 "Launching instance requires configured networks")
 
-        return {
+        rv = {
             'name': name,
             'image': image_id,
             'flavor': flavor,
             'networks': networks
         }
+
+        sgs = vthunder_config.get("nova_security_groups")
+
+        if sgs and len(sgs) > 0:
+            rv["security_groups"] = sgs
+
+        return rv
 
     def create_device_instance(self, vthunder_config, name=None):
         instance_configuration = self._device_instance(vthunder_config, name=name)
